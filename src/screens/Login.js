@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   View, 
   StyleSheet, 
@@ -43,9 +43,9 @@ const Login = () => {
   const [errors, setErrors] = useState({});
   const navigation = useNavigation();
   
-  // 动画值
-  const logoAnim = new Animated.Value(0);
-  const formAnim = new Animated.Value(0);
+  // 使用useRef保存动画值
+  const logoAnim = useRef(new Animated.Value(0)).current;
+  const formAnim = useRef(new Animated.Value(0)).current;
   
   useEffect(() => {
     // 启动进入动画
