@@ -91,3 +91,55 @@ yarn start
 ## 贡献
 
 欢迎通过Pull请求贡献代码。对于重大更改，请先提出问题，以讨论您希望更改的内容。
+
+## API Connection Setup
+
+This app connects to a local Node.js API server. Follow these instructions to ensure proper connection:
+
+### Development Environment Setup
+
+1. Make sure your Node.js API server (hsaapi) is running on port 5000
+2. Configure API connection based on your development environment:
+
+#### For Emulators/Simulators
+
+- iOS Simulator: The default configuration should work with `localhost:5000`
+- Android Emulator: The default configuration should work with `10.0.2.2:5000` (Android's special IP for host machine)
+
+#### For Physical Devices
+
+When testing on physical devices, you'll need to:
+
+1. Open the file `src/constants/config.js`
+2. Uncomment the line with `API_URL` for physical devices
+3. Replace `192.168.x.x` with your computer's actual IP address on your network
+4. Make sure your phone and computer are on the same network
+5. Make sure no firewall is blocking connections to your API server
+
+### Troubleshooting Connection Issues
+
+If you encounter "Network request failed" errors:
+
+1. Check if the API server is running (`npm start` in the hsaapi directory)
+2. Verify your IP address configuration
+3. Make sure your device can reach the API server (try accessing it from a browser)
+4. For quick testing, you can enable Test Mode in `src/constants/config.js`
+
+### Test Mode
+
+For development and testing without an API server:
+
+1. Open `src/constants/config.js`
+2. Set `ENABLE_TEST_MODE: true`
+3. Use one of the test credentials (listed in the config file) with password "password"
+
+## Running the App
+
+```
+npx expo start
+```
+
+This will start the Expo development server. You can then:
+- Press 'a' to open in an Android emulator
+- Press 'i' to open in iOS simulator 
+- Scan the QR code with the Expo Go app on your physical device

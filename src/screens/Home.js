@@ -18,6 +18,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SIZES, SPACING, RADIUS, SHADOWS } from '../constants/theme';
 import Button from '../components/Button';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
@@ -94,7 +95,7 @@ const NotificationCard = ({ message, time, isNew }) => (
 const Home = () => {
   const route = useRoute();
   const navigation = useNavigation();
-  const { username } = route.params || { username: 'User' };
+  const { username, userId, token } = route.params || { username: 'User', userId: null, token: null };
   const [isLoading, setIsLoading] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   
@@ -112,28 +113,40 @@ const Home = () => {
       duration: 800,
       useNativeDriver: true,
     }).start();
+
+    // Redirect to login if no token is available
+    if (!token) {
+      navigation.replace('Login');
+    }
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
+      '确认登出',
+      '确定要退出登录吗？',
       [
         {
-          text: 'Cancel',
+          text: '取消',
           style: 'cancel',
         },
         {
-          text: 'Logout',
-          onPress: () => navigation.navigate('Login'),
-          style: 'destructive',
+          text: '确定',
+          onPress: async () => {
+            // 清除 token
+            await AsyncStorage.removeItem('userToken');
+            // 重置导航到登录页面
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Login', params: { clearData: true } }],
+            });
+          },
         },
       ]
     );
   };
 
   const handleWeightCert = () => {
-    Alert.alert('Weight Certificate', 'This feature is coming soon');
+    navigation.navigate('WeightCertListing');
   };
 
   const handlePlan = () => {
@@ -262,7 +275,7 @@ const Home = () => {
           />
           
           <DashboardCard 
-            title="Reports" 
+            title="Chassis Movement History (CMH)" 
             description="Analytics and statistics"
             colors={['#43A047', '#2E7D32']}
             onPress={() => Alert.alert('Reports', 'Coming soon')}
@@ -319,8 +332,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerLogo: {
-    width: 120,
-    height: 35,
+    width: 150,
+    height: 100,
   },
   headerRight: {
     flexDirection: 'row',

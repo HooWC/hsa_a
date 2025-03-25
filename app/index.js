@@ -10,7 +10,7 @@ const App = () => {
     <SafeAreaProvider>
       <StatusBar 
         barStyle="light-content" 
-        backgroundColor={COLORS.primary}
+        backgroundColor={COLORS.dark}
         translucent={false}
       />
       <AppNavigator />

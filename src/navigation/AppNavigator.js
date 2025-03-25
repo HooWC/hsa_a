@@ -5,6 +5,8 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import Login from '../screens/Login';
 import Home from '../screens/Home';
+import WeightCertListing from '../screens/WeightCert/WeightCertListing';
+import WeightCertDetails from '../screens/WeightCert/WeightCertDetails';
 
 const Stack = createStackNavigator();
 
@@ -42,6 +44,14 @@ const AppNavigator = () => {
           <Stack.Screen 
             name="Home" 
             component={Home}
+          />
+          <Stack.Screen 
+            name="WeightCertListing" 
+            component={WeightCertListing}
+          />
+          <Stack.Screen 
+            name="WeightCertDetails" 
+            component={WeightCertDetails}
           />
         </Stack.Navigator>
       </NavigationContainer>

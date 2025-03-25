@@ -130,7 +130,7 @@ const Input = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: SPACING.lg,
+    marginBottom: SPACING.md,
     height: 70,
   },
   inputContainer: {

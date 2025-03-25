@@ -14,18 +14,16 @@ import {
   TouchableOpacity,
   Alert
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import Input from '../components/Input';
 import Button from '../components/Button';
-import { COLORS, SPACING, SIZES, SHADOWS } from '../constants/theme';
+import { COLORS, SPACING, SIZES, SHADOWS, RADIUS } from '../constants/theme';
+import CONFIG from '../constants/config';
 
 const { width, height } = Dimensions.get('window');
-
-// 固定的用户凭据
-const VALID_USERNAME = 'cmengjin';
-const VALID_PASSWORD = 'hsonline';
 
 const LoginBackground = () => (
   <LinearGradient
@@ -42,8 +40,9 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const navigation = useNavigation();
+  const route = useRoute();
   
-  // 使用useRef保存动画值
+  // 动画值
   const logoAnim = useRef(new Animated.Value(0)).current;
   const formAnim = useRef(new Animated.Value(0)).current;
   
@@ -61,12 +60,18 @@ const Login = () => {
         useNativeDriver: true,
       })
     ]).start();
-  }, []);
+
+    // 如果是从登出操作过来的，清除输入框内容
+    if (route.params?.clearData) {
+      setUsername('');
+      setPassword('');
+      setErrors({});
+    }
+  }, [route.params?.clearData]);
 
   // 处理用户名变更
   const handleUsernameChange = (text) => {
     setUsername(text);
-    // 只有在有错误时才清除错误
     if (errors.username) {
       setErrors(prev => ({ ...prev, username: null }));
     }
@@ -75,22 +80,21 @@ const Login = () => {
   // 处理密码变更
   const handlePasswordChange = (text) => {
     setPassword(text);
-    // 只有在有错误时才清除错误
     if (errors.password) {
       setErrors(prev => ({ ...prev, password: null }));
     }
   };
 
   // 表单验证
-  const validate = () => {
+  const validate = (loginUsername, loginPassword) => {
     const newErrors = {};
     
-    if (!username.trim()) {
-      newErrors.username = 'Username is required';
+    if (!loginUsername?.trim()) {
+      newErrors.username = '请输入用户名';
     }
     
-    if (!password.trim()) {
-      newErrors.password = 'Password is required';
+    if (!loginPassword?.trim()) {
+      newErrors.password = '请输入密码';
     }
     
     setErrors(newErrors);
@@ -98,34 +102,55 @@ const Login = () => {
   };
 
   // 登录处理
-  const handleLogin = () => {
-    if (!validate()) {
+  const handleLogin = async (loginUsername = username, loginPassword = password) => {
+    if (!validate(loginUsername, loginPassword)) {
       return;
     }
     
     setIsLoading(true);
     
-    // 延迟模拟API调用
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      const response = await fetch(`${CONFIG.API_URL}${CONFIG.ENDPOINTS.LOGIN}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ 
+          username: loginUsername, 
+          password: loginPassword 
+        })
+      });
       
-      // 检查用户名和密码是否匹配
-      if (username === VALID_USERNAME && password === VALID_PASSWORD) {
-        navigation.navigate('Home', { username });
+      const data = await response.json();
+      
+      if (response.ok && data.token) {
+        // 保存 token 到 AsyncStorage
+        await AsyncStorage.setItem('userToken', data.token);
+        // 登录成功，直接进入主页
+        navigation.navigate('Home', { 
+          username: data.user.username,
+          userId: data.user.id,
+          token: data.token
+        });
       } else {
-        Alert.alert(
-          'Login Failed', 
-          'Invalid username or password. Please try again.',
-          [{ text: 'OK' }]
-        );
+        // 登录失败，显示错误信息
+        Alert.alert('登录失败', data.message || '用户名或密码错误');
       }
-    }, 1000);
+    } catch (error) {
+      Alert.alert(
+        '连接错误', 
+        '无法连接到服务器，请检查网络连接'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
+        <StatusBar barStyle="light-content" backgroundColor={COLORS.dark} />
         
         <LoginBackground />
         
@@ -140,6 +165,12 @@ const Login = () => {
                   translateY: logoAnim.interpolate({
                     inputRange: [0, 1],
                     outputRange: [-50, 0]
+                  })
+                },
+                {
+                  scale: logoAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.5, 1]
                   })
                 }
               ]
@@ -198,15 +229,9 @@ const Login = () => {
               iconLeft={<Ionicons name="lock-closed-outline" size={20} color={COLORS.primary} />}
             />
             
-            <View style={styles.optionsRow}>
-              <TouchableOpacity>
-                <Text style={styles.forgotPassword}>Forgot Password?</Text>
-              </TouchableOpacity>
-            </View>
-            
             <Button
               label="LOGIN"
-              onPress={handleLogin}
+              onPress={() => handleLogin()}
               isLoading={isLoading}
               style={styles.loginButton}
               rightIcon={<Ionicons name="arrow-forward" size={20} color={COLORS.white} />}
@@ -269,18 +294,8 @@ const styles = StyleSheet.create({
     padding: SPACING.xl,
     ...SHADOWS.dark,
   },
-  optionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginBottom: SPACING.lg,
-  },
-  forgotPassword: {
-    color: COLORS.primary,
-    fontSize: SIZES.small,
-    fontWeight: '500',
-  },
   loginButton: {
-    marginTop: SPACING.sm,
+    marginTop: SPACING.lg,
   },
   footerTextContainer: {
     marginTop: SPACING.xl,
@@ -295,7 +310,7 @@ const styles = StyleSheet.create({
     color: COLORS.gray,
     fontSize: SIZES.small * 0.8,
     marginTop: 5,
-  },
+  }
 });
 
 export default Login; 
