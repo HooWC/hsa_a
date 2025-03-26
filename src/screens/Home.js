@@ -150,7 +150,7 @@ const Home = () => {
   };
 
   const handlePlan = () => {
-    Alert.alert('Plan', 'This feature is coming soon');
+    navigation.navigate('PlanListing');
   };
   
   const toggleNotifications = () => {
@@ -159,7 +159,7 @@ const Home = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.dark} />
       
       {/* 渐变标题栏 */}
       <Animated.View

@@ -82,27 +82,27 @@ const WeightCertDetails = () => {
         <Text style={styles.sectionTitle}>Engine Specifications</Text>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>C.c</Text>
-          <Text style={styles.infoValue}>{cert.cc ? `${cert.cc} mm` : 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.cc || 'N/A'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Engine Type</Text>
-          <Text style={styles.infoValue}>{cert.cc ? `${cert.cc} mm` : 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.engine_id || 'N/A'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Engine Desc</Text>
-          <Text style={styles.infoValue}>{cert.wheelbase ? `${cert.wheelbase} mm` : 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.engine_if || 'N/A'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Power</Text>
-          <Text style={styles.infoValue}>{cert.wheelbase ? `${cert.wheelbase} mm` : 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.power || 'N/A'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Torque</Text>
-          <Text style={styles.infoValue}>{cert.engineType || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.torque || 'N/A'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Bahan Bakar</Text>
-          <Text style={styles.infoValue}>{cert.transmission || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.fueltype || 'N/A'}</Text>
         </View>
       </View>
     </View>
@@ -188,15 +188,15 @@ const WeightCertDetails = () => {
         <Text style={styles.sectionTitle}>Misc. Weight Details</Text>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Gandar Depan</Text>
-          <Text style={styles.infoValue}>{cert.wheelbase ? `${cert.g_front} mm` : 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.wheelbase ? `${cert.g_front}` : 'N/A'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Gandar Belakang</Text>
-          <Text style={styles.infoValue}>{cert.wheelbase ? `${cert.g_rear} mm` : 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.wheelbase ? `${cert.g_rear}` : 'N/A'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>GVW/GCW</Text>
-          <Text style={styles.infoValue}>{cert.wheelbase ? `${cert.gvw} mm` : 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.wheelbase ? `${cert.gvw}` : 'N/A'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>BDM/BGK(W)</Text>
@@ -212,7 +212,7 @@ const WeightCertDetails = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
+      <StatusBar barStyle="light-content" backgroundColor={COLORS.dark} />
 
       {/* Header */}
       <LinearGradient
@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
   infoLabel: {
     fontSize: SIZES.small,
     color: COLORS.gray,
-    flex: 1.5,
+    flex: 1.4,
   },
   infoValue: {
     fontSize: SIZES.small,

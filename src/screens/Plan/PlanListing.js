@@ -15,22 +15,21 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SPACING, SIZES, SHADOWS, RADIUS } from '../../constants/theme';
-import { API_BASE_URL } from '../../constants/config';
 
-const WeightCertListing = () => {
+const PlanListing = () => {
   const navigation = useNavigation();
   const [searchQuery, setSearchQuery] = useState('');
-  const [weightCerts, setWeightCerts] = useState([]);
+  const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchWeightCerts = async () => {
+  const fetchPlans = async () => {
     try {
       const token = await AsyncStorage.getItem('userToken');
       console.log('Token:', token);
 
-      const response = await fetch('http://10.10.10.14:5000/weightCerts', {
+      const response = await fetch('http://10.10.10.14:5000/plans', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -39,8 +38,8 @@ const WeightCertListing = () => {
       });
 
       const data = await response.json();
-      console.log('WeightCerts data:', data);
-      setWeightCerts(data);
+      console.log('Plans data:', data);
+      setPlans(data);
     } catch (err) {
       console.error('Error:', err);
       setError('获取数据失败');
@@ -51,72 +50,67 @@ const WeightCertListing = () => {
   };
 
   useEffect(() => {
-    fetchWeightCerts();
+    fetchPlans();
   }, []);
 
   const onRefresh = () => {
     setRefreshing(true);
-    fetchWeightCerts();
+    fetchPlans();
   };
 
   const handleSearch = (text) => {
     setSearchQuery(text);
   };
 
-  const filteredCerts = weightCerts.filter(cert => {
-    if (!cert) return false;
+  const filteredPlans = plans.filter(plan => {
+    if (!plan) return false;
     const searchLower = searchQuery.toLowerCase();
     
-    // 检查所有字段
     return (
-      (cert.mgroup_id && cert.mgroup_id.toString().toLowerCase().includes(searchLower)) || // Model Group
-      (cert.make && cert.make.toString().toLowerCase().includes(searchLower)) || // Make
-      (cert.model_id && cert.model_id.toString().toLowerCase().includes(searchLower)) || // Id
-      (cert.wheelbase && cert.wheelbase.toString().toLowerCase().includes(searchLower)) || // Wheelbase
-      (cert.bdm_w && cert.bdm_w.toString().toLowerCase().includes(searchLower)) || // BDM/BGK(W)
-      (cert.bdm_e && cert.bdm_e.toString().toLowerCase().includes(searchLower)) || // BDM/BGK(G)
-      (cert.axle && cert.axle.toString().toLowerCase().includes(searchLower)) // Axle
+      (plan.plan_id && plan.plan_id.toString().toLowerCase().includes(searchLower)) ||
+      (plan.model_id && plan.model_id.toString().toLowerCase().includes(searchLower)) ||
+      (plan.body_type && plan.body_type.toString().toLowerCase().includes(searchLower)) ||
+      (plan.bdm && plan.bdm.toString().toLowerCase().includes(searchLower)) ||
+      (plan.wheelbase && plan.wheelbase.toString().toLowerCase().includes(searchLower))
     );
   });
 
-  const renderWeightCert = ({ item }) => {
+  const renderPlan = ({ item }) => {
     if (!item) return null;
     
     return (
       <TouchableOpacity
         style={styles.card}
-        onPress={() => navigation.navigate('WeightCertDetails', { cert: item })}
+        onPress={() => navigation.navigate('PlanDetails', { plan: item })}
       >
         <View style={styles.cardHeader}>
-          <Text style={styles.cardId}>Model Group</Text>
+          <Text style={styles.cardId}>Plan #</Text>
           <Text style={styles.cardDate}>
-            {item.mgroup_id || 'N/A'}
+            {item.plan_id || 'N/A'}
           </Text>
         </View>
         <View style={styles.cardContent}>
           <View style={styles.cardRow}>
-            <Text style={styles.cardLabel}>Make</Text>
-            <Text style={styles.cardValue}>{item.make || 'N/A'}</Text>
-          </View>
-          <View style={styles.cardRow}>
-            <Text style={styles.cardLabel}>Id</Text>
+            <Text style={styles.cardLabel}>Model #</Text>
             <Text style={styles.cardValue}>{item.model_id || 'N/A'}</Text>
           </View>
+          <View style={[styles.cardRow, styles.bodyTypeRow]}>
+            <Text style={styles.cardLabel}>Body Type</Text>
+            <View style={styles.bodyTypeContainer}>
+              <Text style={[styles.cardValue, styles.bodyTypeValue]} numberOfLines={2}>
+                {item.body_type?.length > 50 
+                  ? item.body_type.substring(0, 50) + '...' 
+                  : item.body_type || 'N/A'}
+              </Text>
+            </View>
+          </View>
           <View style={styles.cardRow}>
-            <Text style={styles.cardLabel}>Whenlbase</Text>
+            <Text style={styles.cardLabel}>BDM</Text>
+            <Text style={styles.cardValue}>{item.bdm || 'N/A'}</Text>
+          </View>
+          <View style={styles.cardRow}>
+            <Text style={styles.cardLabel}>Wheelbase</Text>
             <Text style={styles.cardValue}>{item.wheelbase || 'N/A'}</Text>
-          </View>
-          <View style={styles.cardRow}>
-            <Text style={styles.cardLabel}>BDM/BGK(W)</Text>
-            <Text style={styles.cardValue}>{item.bdm_w || 'N/A'}</Text>
-          </View>
-          <View style={styles.cardRow}>
-            <Text style={styles.cardLabel}>BDM/BGK(E)</Text>
-            <Text style={styles.cardValue}>{item.bdm_e || 'N/A'}</Text>
-          </View>
-          <View style={styles.cardRow}>
-            <Text style={styles.cardLabel}>Axle</Text>
-            <Text style={styles.cardValue}>{item.axle || 'N/A'}</Text>
           </View>
         </View>
         <View style={styles.cardFooter}>
@@ -130,7 +124,7 @@ const WeightCertListing = () => {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={COLORS.primary} />
-        <Text style={styles.loadingText}>加载中...</Text>
+        <Text style={styles.loadingText}>Loading...</Text>
       </View>
     );
   }
@@ -152,7 +146,7 @@ const WeightCertListing = () => {
         >
           <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Weight Certificates</Text>
+        <Text style={styles.headerTitle}>Plan Listing</Text>
       </LinearGradient>
 
       {/* Search Bar */}
@@ -185,9 +179,9 @@ const WeightCertListing = () => {
 
       {/* List */}
       <FlatList
-        data={filteredCerts}
-        renderItem={renderWeightCert}
-        keyExtractor={item => item.id}
+        data={filteredPlans}
+        renderItem={renderPlan}
+        keyExtractor={item => item.id?.toString()}
         contentContainerStyle={styles.listContainer}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
@@ -196,7 +190,7 @@ const WeightCertListing = () => {
           !error && (
             <View style={styles.emptyContainer}>
               <Ionicons name="document-text-outline" size={48} color={COLORS.gray} />
-              <Text style={styles.emptyText}>No weight certificates found</Text>
+              <Text style={styles.emptyText}>No plans found</Text>
             </View>
           )
         }
@@ -287,14 +281,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#F0F0F0',
   },
+  cardDate: {
+    fontSize: SIZES.small,
+    color: COLORS.gray,
+  },
   cardId: {
     fontSize: SIZES.medium,
     fontWeight: 'bold',
     color: COLORS.primary,
-  },
-  cardDate: {
-    fontSize: SIZES.small,
-    color: COLORS.gray,
   },
   cardContent: {
     padding: SPACING.md,
@@ -328,6 +322,21 @@ const styles = StyleSheet.create({
     fontSize: SIZES.medium,
     color: COLORS.gray,
   },
+  bodyTypeRow: {
+    alignItems: 'flex-start',
+    marginVertical: SPACING.sm,
+  },
+  bodyTypeContainer: {
+    flex: 1,
+    paddingLeft: SPACING.lg,
+  },
+  bodyTypeValue: {
+    flex: 0.3,
+    textAlign: 'right',
+    flexWrap: 'wrap',
+    paddingHorizontal: SPACING.sm,
+    lineHeight: 20,
+  },
 });
 
-export default WeightCertListing; 
+export default PlanListing; 

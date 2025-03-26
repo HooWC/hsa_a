@@ -7,6 +7,9 @@ import Login from '../screens/Login';
 import Home from '../screens/Home';
 import WeightCertListing from '../screens/WeightCert/WeightCertListing';
 import WeightCertDetails from '../screens/WeightCert/WeightCertDetails';
+import PlanListing from '../screens/Plan/PlanListing';
+import PlanDetails from '../screens/Plan/PlanDetails';
+import PlanDocument from '../screens/Plan/PlanDocument';
 
 const Stack = createStackNavigator();
 
@@ -52,6 +55,18 @@ const AppNavigator = () => {
           <Stack.Screen 
             name="WeightCertDetails" 
             component={WeightCertDetails}
+          />
+          <Stack.Screen 
+            name="PlanListing" 
+            component={PlanListing}
+          />
+          <Stack.Screen 
+            name="PlanDetails" 
+            component={PlanDetails}
+          />
+          <Stack.Screen 
+            name="PlanDocument" 
+            component={PlanDocument}
           />
         </Stack.Navigator>
       </NavigationContainer>
