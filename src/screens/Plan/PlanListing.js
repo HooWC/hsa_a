@@ -86,13 +86,13 @@ const PlanListing = () => {
         <View style={styles.cardHeader}>
           <Text style={styles.cardId}>Plan #</Text>
           <Text style={styles.cardDate}>
-            {item.plan_id || 'N/A'}
+            {item.plan_id || '-'}
           </Text>
         </View>
         <View style={styles.cardContent}>
           <View style={styles.cardRow}>
-            <Text style={styles.cardLabel}>Model #</Text>
-            <Text style={styles.cardValue}>{item.model_id || 'N/A'}</Text>
+            <Text style={styles.cardLabel}>Model</Text>
+            <Text style={styles.cardValue}>{item.model_id || '-'}</Text>
           </View>
           <View style={[styles.cardRow, styles.bodyTypeRow]}>
             <Text style={styles.cardLabel}>Body Type</Text>
@@ -100,17 +100,17 @@ const PlanListing = () => {
               <Text style={[styles.cardValue, styles.bodyTypeValue]} numberOfLines={2}>
                 {item.body_type?.length > 50 
                   ? item.body_type.substring(0, 50) + '...' 
-                  : item.body_type || 'N/A'}
+                  : item.body_type || '-'}
               </Text>
             </View>
           </View>
           <View style={styles.cardRow}>
             <Text style={styles.cardLabel}>BDM</Text>
-            <Text style={styles.cardValue}>{item.bdm || 'N/A'}</Text>
+            <Text style={styles.cardValue}>{item.bdm || '-'}</Text>
           </View>
           <View style={styles.cardRow}>
             <Text style={styles.cardLabel}>Wheelbase</Text>
-            <Text style={styles.cardValue}>{item.wheelbase || 'N/A'}</Text>
+            <Text style={styles.cardValue}>{item.wheelbase || '-'}</Text>
           </View>
         </View>
         <View style={styles.cardFooter}>

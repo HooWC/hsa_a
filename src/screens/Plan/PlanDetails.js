@@ -20,7 +20,7 @@ const PlanDetails = () => {
   const renderDetailRow = (label, value) => (
     <View style={styles.detailRow}>
       <Text style={styles.detailLabel}>{label}</Text>
-      <Text style={styles.detailValue}>{value || 'N/A'}</Text>
+      <Text style={styles.detailValue}>{value || '-'}</Text>
     </View>
   );
 
@@ -40,11 +40,11 @@ const PlanDetails = () => {
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>BDM</Text>
-          <Text style={styles.infoValue}>{plan.bdm || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{plan.bdm || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>WheelBase</Text>
-          <Text style={styles.infoValue}>{plan.wheelbase || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{plan.wheelbase || '-'}</Text>
         </View>
       </View>
 
@@ -52,35 +52,35 @@ const PlanDetails = () => {
         <Text style={styles.sectionTitle}>Plan Infomation</Text>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Plan #</Text>
-          <Text style={styles.infoValue}>{plan.plan_id || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{plan.plan_id || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Cabin Type</Text>
-          <Text style={styles.infoValue}>{plan.cabin_type || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{plan.cabin_type || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Length</Text>
-          <Text style={styles.infoValue}>{plan.length || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{plan.length || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Model Group</Text>
-          <Text style={styles.infoValue}>{plan.model_id || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{plan.model_id || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Make</Text>
-          <Text style={styles.infoValue}>{plan.make || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{plan.make || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Overall (Length)</Text>
-          <Text style={styles.infoValue}>{plan.olength || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{plan.olength || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Overall (Width)</Text>
-          <Text style={styles.infoValue}>{plan.owidth || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{plan.owidth || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Overall (Height)</Text>
-          <Text style={styles.infoValue}>{plan.oheight || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{plan.oheight || '-'}</Text>
         </View>
       </View>
     </View>

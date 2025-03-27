@@ -153,6 +153,10 @@ const Home = () => {
     navigation.navigate('PlanListing');
   };
   
+  const handleCMH = () => {
+    navigation.navigate('CMHListing');
+  };
+  
   const toggleNotifications = () => {
     setShowNotifications(!showNotifications);
   };
@@ -256,32 +260,32 @@ const Home = () => {
         </View>
         
         <View style={styles.cardsContainer}>
-          <DashboardCard 
-            title="Weight Certificate" 
-            description="Manage all your certificates"
-            colors={['#1E88E5', '#0D47A1']}
+          <DashboardCard
+            title="Weight Certificates"
+            description="Manage weight certificates"
+            icon={<Ionicons name="document-text-outline" size={32} color="#fff" />}
             onPress={handleWeightCert}
-            icon={<Ionicons name="document-text-outline" size={28} color="#fff" />}
-            delay={100}
-          />
-          
-          <DashboardCard 
-            title="Plan" 
-            description="View and manage plans"
-            colors={['#455A64', '#263238']}
-            onPress={handlePlan}
-            icon={<Ionicons name="calendar-outline" size={28} color="#fff" />}
-            delay={200}
-          />
-          
-          <DashboardCard 
-            title="Chassis Movement History (CMH)" 
-            description="Analytics and statistics"
-            colors={['#43A047', '#2E7D32']}
-            onPress={() => Alert.alert('Reports', 'Coming soon')}
-            icon={<Ionicons name="bar-chart-outline" size={28} color="#fff" />}
+            colors={['#FF6B6B', '#FF8E8E']}
             delay={300}
           />
+
+          <DashboardCard
+            title="Plans"
+            description="View and manage plans"
+            icon={<Ionicons name="clipboard-outline" size={32} color="#fff" />}
+            onPress={handlePlan}
+            colors={['#455A64', '#263238']}
+            delay={450}
+          />
+
+          <DashboardCard
+            title="Chassis Movement"
+            description="Track chassis movement history"
+            icon={<Ionicons name="car-outline" size={32} color="#fff" />}
+            onPress={handleCMH}
+            colors={['#4A6FDC', '#77A2F9']}
+            delay={600}
+          />  
         </View>
         
         <View style={styles.sectionHeader}>

@@ -10,6 +10,11 @@ import WeightCertDetails from '../screens/WeightCert/WeightCertDetails';
 import PlanListing from '../screens/Plan/PlanListing';
 import PlanDetails from '../screens/Plan/PlanDetails';
 import PlanDocument from '../screens/Plan/PlanDocument';
+import CMHListing from '../screens/CMH/CMHListing';
+import CMHDetails from '../screens/CMH/CMHDetails';
+import ChassisItemDetail from '../screens/CMH/ChassisItemDetail';
+import SODetail from '../screens/CMH/SODetail';
+import QuotDetail from '../screens/CMH/QuotDetail';
 
 const Stack = createStackNavigator();
 
@@ -67,6 +72,26 @@ const AppNavigator = () => {
           <Stack.Screen 
             name="PlanDocument" 
             component={PlanDocument}
+          />
+          <Stack.Screen 
+            name="CMHListing" 
+            component={CMHListing}
+          />
+          <Stack.Screen 
+            name="CMHDetails" 
+            component={CMHDetails}
+          />
+          <Stack.Screen 
+            name="ChassisItemDetail" 
+            component={ChassisItemDetail}
+          />
+          <Stack.Screen 
+            name="SODetail" 
+            component={SODetail}
+          />
+          <Stack.Screen 
+            name="QuotDetail" 
+            component={QuotDetail}
           />
         </Stack.Navigator>
       </NavigationContainer>

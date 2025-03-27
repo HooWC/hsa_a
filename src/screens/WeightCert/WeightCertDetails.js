@@ -58,23 +58,23 @@ const WeightCertDetails = () => {
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>ID</Text>
-          <Text style={styles.infoValue}>{cert.model_id || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.model_id || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>WheelBase</Text>
-          <Text style={styles.infoValue}>{cert.wheelbase || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.wheelbase || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>BDM/BGK(W)</Text>
-          <Text style={styles.infoValue}>{cert.bdm_w || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.bdm_w || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>BDM/BGK(E)</Text>
-          <Text style={styles.infoValue}>{cert.bdm_e || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.bdm_e || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Axle</Text>
-          <Text style={styles.infoValue}>{cert.axle || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.axle || '-'}</Text>
         </View>
       </View>
 
@@ -82,27 +82,27 @@ const WeightCertDetails = () => {
         <Text style={styles.sectionTitle}>Engine Specifications</Text>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>C.c</Text>
-          <Text style={styles.infoValue}>{cert.cc || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.cc || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Engine Type</Text>
-          <Text style={styles.infoValue}>{cert.engine_id || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.engine_id || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Engine Desc</Text>
-          <Text style={styles.infoValue}>{cert.engine_if || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.engine_if || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Power</Text>
-          <Text style={styles.infoValue}>{cert.power || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.power || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Torque</Text>
-          <Text style={styles.infoValue}>{cert.torque || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.torque || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Bahan Bakar</Text>
-          <Text style={styles.infoValue}>{cert.fueltype || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.fueltype || '-'}</Text>
         </View>
       </View>
     </View>
@@ -114,31 +114,31 @@ const WeightCertDetails = () => {
         <Text style={styles.sectionTitle}>Chassis Infomation</Text>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Truck WIdth (Front)</Text>
-          <Text style={styles.infoValue}>{cert.tw_front || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.tw_front || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Truck Width (Rear)</Text>
-          <Text style={styles.infoValue}>{cert.tw_rear || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.tw_rear || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Overall (Length)</Text>
-          <Text style={styles.infoValue}>{cert.olength || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.olength || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Overall (Width)</Text>
-          <Text style={styles.infoValue}>{cert.owidth || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.owidth || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Overall (Height)</Text>
-          <Text style={styles.infoValue}>{cert.oheight || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.oheight || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Overhang (Front)</Text>
-          <Text style={styles.infoValue}>{cert.oh_front || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.oh_front || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Overhang (Rear)</Text>
-          <Text style={styles.infoValue}>{cert.oh_rear || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.oh_rear || '-'}</Text>
         </View>
       </View>
     </View>
@@ -160,27 +160,27 @@ const WeightCertDetails = () => {
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Ply</Text>
-          <Text style={styles.infoValue}>{cert.tyre_ply || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.tyre_ply || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Front</Text>
-          <Text style={styles.infoValue}>{cert.tyre_front || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.tyre_front || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Back</Text>
-          <Text style={styles.infoValue}>{cert.tyre_back || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.tyre_back || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Front</Text>
-          <Text style={styles.infoValue}>{cert.wheel_front || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.wheel_front || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Rear</Text>
-          <Text style={styles.infoValue}>{cert.wheel_rear || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.wheel_rear || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Option</Text>
-          <Text style={styles.infoValue}>{cert.tyre_option || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.tyre_option || '-'}</Text>
         </View>
       </View>
 
@@ -188,23 +188,23 @@ const WeightCertDetails = () => {
         <Text style={styles.sectionTitle}>Misc. Weight Details</Text>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Gandar Depan</Text>
-          <Text style={styles.infoValue}>{cert.wheelbase ? `${cert.g_front}` : 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.wheelbase ? `${cert.g_front}` : '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>Gandar Belakang</Text>
-          <Text style={styles.infoValue}>{cert.wheelbase ? `${cert.g_rear}` : 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.wheelbase ? `${cert.g_rear}` : '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>GVW/GCW</Text>
-          <Text style={styles.infoValue}>{cert.wheelbase ? `${cert.gvw}` : 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.wheelbase ? `${cert.gvw}` : '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>BDM/BGK(W)</Text>
-          <Text style={styles.infoValue}>{cert.bdm_w || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.bdm_w || '-'}</Text>
         </View>
         <View style={styles.infoRow}>
           <Text style={styles.infoLabel}>BDM/BGK(E)</Text>
-          <Text style={styles.infoValue}>{cert.bdm_e || 'N/A'}</Text>
+          <Text style={styles.infoValue}>{cert.bdm_e || '-'}</Text>
         </View>
       </View>
     </View>
