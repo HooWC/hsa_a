@@ -17,19 +17,18 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SIZES, SPACING, RADIUS, SHADOWS } from '../constants/theme';
-import Button from '../components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
-// 卡片项组件 - 带渐变背景的时尚卡片
+// 卡片项组件 - 美化版本
 const DashboardCard = ({ title, icon, description, onPress, colors, delay = 0 }) => {
   const animValue = new Animated.Value(0);
   
   useEffect(() => {
     Animated.timing(animValue, {
       toValue: 1,
-      duration: 500,
+      duration: 600,
       delay: delay,
       useNativeDriver: true,
     }).start();
@@ -53,7 +52,7 @@ const DashboardCard = ({ title, icon, description, onPress, colors, delay = 0 })
       ]}
     >
       <TouchableOpacity 
-        activeOpacity={0.8}
+        activeOpacity={0.88}
         onPress={onPress}
         style={styles.cardTouchable}
       >
@@ -81,7 +80,7 @@ const DashboardCard = ({ title, icon, description, onPress, colors, delay = 0 })
   );
 };
 
-// 通知卡片组件
+// 通知卡片组件 - 美化版本
 const NotificationCard = ({ message, time, isNew }) => (
   <View style={styles.notificationCard}>
     {isNew && <View style={styles.notificationDot} />}
@@ -106,11 +105,19 @@ const Home = () => {
   ];
   
   const headerAnim = new Animated.Value(0);
+  const welcomeAnim = new Animated.Value(0);
   
   useEffect(() => {
     Animated.timing(headerAnim, {
       toValue: 1,
       duration: 800,
+      useNativeDriver: true,
+    }).start();
+    
+    Animated.timing(welcomeAnim, {
+      toValue: 1,
+      duration: 800,
+      delay: 300,
       useNativeDriver: true,
     }).start();
 
@@ -122,15 +129,15 @@ const Home = () => {
 
   const handleLogout = async () => {
     Alert.alert(
-      '确认登出',
-      '确定要退出登录吗？',
+      'Confirm',
+      'Are you sure you want to log out?',
       [
         {
-          text: '取消',
+          text: 'Cancel',
           style: 'cancel',
         },
         {
-          text: '确定',
+          text: 'Sure',
           onPress: async () => {
             // 清除 token
             await AsyncStorage.removeItem('userToken');
@@ -163,48 +170,30 @@ const Home = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.dark} />
+     <StatusBar
+        barStyle="light-content"
+        backgroundColor="#475569"
+        translucent={false}
+      />
       
-      {/* 渐变标题栏 */}
-      <Animated.View
-        style={[
-          styles.headerContainer,
-          {
-            opacity: headerAnim,
-            transform: [
-              { 
-                translateY: headerAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [-50, 0]
-                })
-              }
-            ]
-          }
-        ]}
+      {/* Header */}
+      <LinearGradient
+        colors={['#475569', '#64748B']}
+        style={styles.header}
       >
-        <LinearGradient
-          colors={['#1565C0', '#1976D2']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={styles.header}
-        >
+        <View style={styles.headerContent}>
           <View style={styles.headerLeft}>
             <Image 
               source={require('../../assets/logo.png')} 
               style={styles.headerLogo}
               resizeMode="contain"
             />
+            <View style={styles.headerTextContainer}>
+              <Text style={styles.greeting}>Welcome back,</Text>
+              <Text style={styles.username}>{username || 'User'}</Text>
+            </View>
           </View>
-          
           <View style={styles.headerRight}>
-            <TouchableOpacity 
-              style={styles.headerButton}
-              onPress={toggleNotifications}
-            >
-              <Ionicons name="notifications-outline" size={24} color={COLORS.white} />
-              {notifications.some(n => n.isNew) && <View style={styles.notificationBadge} />}
-            </TouchableOpacity>
-            
             <TouchableOpacity 
               style={styles.headerButton}
               onPress={handleLogout}
@@ -212,22 +201,52 @@ const Home = () => {
               <Ionicons name="log-out-outline" size={24} color={COLORS.white} />
             </TouchableOpacity>
           </View>
+        </View>
+      </LinearGradient>
+      
+      {/* 欢迎栏 - 美化版本 */}
+      <Animated.View
+        style={[
+          styles.welcomeContainer,
+          {
+            opacity: welcomeAnim,
+            transform: [
+              { 
+                translateY: welcomeAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [50, 0]
+                })
+              }
+            ]
+          }
+        ]}
+      >
+        <LinearGradient
+          colors={['rgba(59, 130, 246, 0.05)', 'rgba(59, 130, 246, 0.01)']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.welcomeBar}
+        >
+          <View>
+            <Text style={styles.welcomeText}>Welcome, {username}</Text>
+            <Text style={styles.dateText}>{new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</Text>
+          </View>
+          <View style={styles.welcomeIconContainer}>
+            <Ionicons name="sunny-outline" size={24} color={COLORS.primary} />
+          </View>
         </LinearGradient>
       </Animated.View>
       
-      {/* 欢迎栏 */}
-      <View style={styles.welcomeBar}>
-        <Text style={styles.welcomeText}>Welcome, {username}</Text>
-        <Text style={styles.dateText}>{new Date().toDateString()}</Text>
-      </View>
-      
-      {/* 通知面板 - 可折叠 */}
+      {/* 通知面板 - 美化版本 */}
       {showNotifications && (
         <View style={styles.notificationsPanel}>
           <View style={styles.notificationsHeader}>
             <Text style={styles.notificationsTitle}>Notifications</Text>
-            <TouchableOpacity onPress={toggleNotifications}>
-              <Ionicons name="close" size={20} color={COLORS.darkGray} />
+            <TouchableOpacity 
+              onPress={toggleNotifications}
+              style={styles.closeButton}
+            >
+              <Ionicons name="close-circle" size={24} color={COLORS.gray} />
             </TouchableOpacity>
           </View>
           
@@ -249,7 +268,7 @@ const Home = () => {
         </View>
       )}
       
-      {/* 主内容区 */}
+      {/* 主内容区 - 美化版本 */}
       <ScrollView 
         style={styles.contentContainer}
         contentContainerStyle={styles.scrollContent}
@@ -263,51 +282,29 @@ const Home = () => {
           <DashboardCard
             title="Weight Certificates"
             description="Manage weight certificates"
-            icon={<Ionicons name="document-text-outline" size={32} color="#fff" />}
+            icon={<Ionicons name="document-text" size={32} color="#fff" />}
             onPress={handleWeightCert}
-            colors={['#FF6B6B', '#FF8E8E']}
-            delay={300}
+            colors={['#F43F5E', '#FB7185']}
+            delay={200}
           />
 
           <DashboardCard
             title="Plans"
             description="View and manage plans"
-            icon={<Ionicons name="clipboard-outline" size={32} color="#fff" />}
+            icon={<Ionicons name="clipboard" size={32} color="#fff" />}
             onPress={handlePlan}
-            colors={['#455A64', '#263238']}
-            delay={450}
+            colors={['#0F172A', '#334155']}
+            delay={350}
           />
 
           <DashboardCard
             title="Chassis Movement"
             description="Track chassis movement history"
-            icon={<Ionicons name="car-outline" size={32} color="#fff" />}
+            icon={<Ionicons name="car" size={32} color="#fff" />}
             onPress={handleCMH}
-            colors={['#4A6FDC', '#77A2F9']}
-            delay={600}
+            colors={['#2563EB', '#3B82F6']}
+            delay={500}
           />  
-        </View>
-        
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Quick Actions</Text>
-        </View>
-        
-        <View style={styles.quickActions}>
-          <Button
-            label="View Recent"
-            variant="outline"
-            onPress={() => Alert.alert('Recent', 'Coming soon')}
-            leftIcon={<Ionicons name="time-outline" size={20} color={COLORS.primary} />}
-            style={styles.quickActionButton}
-          />
-          
-          <Button
-            label="Create New"
-            variant="secondary"
-            onPress={() => Alert.alert('Create', 'Coming soon')}
-            leftIcon={<Ionicons name="add-circle-outline" size={20} color={COLORS.white} />}
-            style={styles.quickActionButton}
-          />
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -317,27 +314,47 @@ const Home = () => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F5F7FA',
-  },
-  headerContainer: {
-    width: '100%',
-    ...SHADOWS.medium,
+    backgroundColor: '#F8FAFC',
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.md,
-    paddingHorizontal: SPACING.lg,
-    height: 60,
+    height: 70,
+    ...SHADOWS.medium,
+  },
+  headerContent: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   headerLogo: {
-    width: 150,
-    height: 100,
+    width: 40,
+    height: 40,
+    marginRight: 10,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
+    padding: 5,
+  },
+  headerTextContainer: {
+    flexDirection: 'column',
+  },
+  greeting: {
+    fontSize: SIZES.small,
+    color: '#E2E8F0',
+    marginBottom: 2,
+  },
+  username: {
+    fontSize: SIZES.medium,
+    fontWeight: 'bold',
+    color: '#F1F5F9',
   },
   headerRight: {
     flexDirection: 'row',
@@ -345,8 +362,7 @@ const styles = StyleSheet.create({
   },
   headerButton: {
     padding: SPACING.xs,
-    marginLeft: SPACING.md,
-    position: 'relative',
+    marginLeft: SPACING.sm,
   },
   notificationBadge: {
     position: 'absolute',
@@ -355,14 +371,22 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#FF5252',
+    backgroundColor: '#EF4444',
     borderWidth: 1,
     borderColor: COLORS.white,
   },
+  welcomeContainer: {
+    paddingHorizontal: SPACING.md,
+    paddingTop: SPACING.md,
+  },
   welcomeBar: {
     backgroundColor: COLORS.white,
+    borderRadius: RADIUS.lg,
     padding: SPACING.lg,
-    ...SHADOWS.light,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    ...SHADOWS.medium,
   },
   welcomeText: {
     color: COLORS.darkGray,
@@ -374,11 +398,19 @@ const styles = StyleSheet.create({
     fontSize: SIZES.small,
     marginTop: 4,
   },
+  welcomeIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   notificationsPanel: {
     backgroundColor: COLORS.white,
     marginHorizontal: SPACING.lg,
     marginTop: SPACING.md,
-    borderRadius: RADIUS.md,
+    borderRadius: RADIUS.lg,
     padding: SPACING.md,
     ...SHADOWS.medium,
     maxHeight: 250,
@@ -388,24 +420,30 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: SPACING.sm,
+    paddingBottom: SPACING.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F1F5F9',
   },
   notificationsTitle: {
     fontSize: SIZES.medium,
     fontWeight: 'bold',
     color: COLORS.darkGray,
   },
+  closeButton: {
+    padding: 4,
+  },
   notificationCard: {
     flexDirection: 'row',
     padding: SPACING.sm,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: '#F1F5F9',
     position: 'relative',
   },
   notificationDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: COLORS.primary,
+    backgroundColor: '#3B82F6',
     position: 'absolute',
     left: 0,
     top: SPACING.sm + 6,
@@ -417,6 +455,7 @@ const styles = StyleSheet.create({
   notificationText: {
     fontSize: SIZES.small,
     color: COLORS.darkGray,
+    fontWeight: '500',
   },
   notificationTime: {
     fontSize: SIZES.small * 0.9,
@@ -442,28 +481,30 @@ const styles = StyleSheet.create({
     fontSize: SIZES.medium,
     fontWeight: 'bold',
     color: COLORS.darkGray,
+    letterSpacing: 0.5,
   },
   cardsContainer: {
     marginBottom: SPACING.xl,
   },
   cardContainer: {
     marginBottom: SPACING.md,
-    borderRadius: RADIUS.md,
+    borderRadius: RADIUS.lg,
     ...SHADOWS.medium,
   },
   cardTouchable: {
-    borderRadius: RADIUS.md,
+    borderRadius: RADIUS.lg,
     overflow: 'hidden',
   },
   cardGradient: {
     flexDirection: 'row',
     padding: SPACING.lg,
     alignItems: 'center',
+    height: 100,
   },
   cardIconContainer: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: 'rgba(255,255,255,0.2)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -476,23 +517,15 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: SIZES.large,
     fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
   cardDescription: {
     color: 'rgba(255,255,255,0.8)',
     fontSize: SIZES.small,
-    marginTop: 2,
+    marginTop: 4,
   },
   cardArrow: {
     padding: SPACING.xs,
-  },
-  quickActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: SPACING.sm,
-  },
-  quickActionButton: {
-    flex: 1,
-    marginHorizontal: SPACING.xs,
   },
 });
 

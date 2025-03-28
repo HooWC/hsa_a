@@ -12,7 +12,10 @@ import {
   Text,
   Animated,
   TouchableOpacity,
-  Alert
+  Alert,
+  TextInput,
+  ActivityIndicator,
+  ScrollView
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -27,9 +30,9 @@ const { width, height } = Dimensions.get('window');
 
 const LoginBackground = () => (
   <LinearGradient
-    colors={['#1565C0', '#1976D2', '#42A5F5']}
+    colors={['#0F172A', '#334155', '#475569']}
     start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
+    end={{ x: 0, y: 1 }}
     style={StyleSheet.absoluteFill}
   />
 );
@@ -39,12 +42,16 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const navigation = useNavigation();
   const route = useRoute();
+  const scrollViewRef = useRef(null);
   
   // 动画值
   const logoAnim = useRef(new Animated.Value(0)).current;
   const formAnim = useRef(new Animated.Value(0)).current;
+  const shineAnim = useRef(new Animated.Value(-width)).current;
   
   useEffect(() => {
     // 启动进入动画
@@ -60,6 +67,15 @@ const Login = () => {
         useNativeDriver: true,
       })
     ]).start();
+    
+    // 添加闪光效果动画
+    Animated.loop(
+      Animated.timing(shineAnim, {
+        toValue: width,
+        duration: 3000,
+        useNativeDriver: true,
+      })
+    ).start();
 
     // 如果是从登出操作过来的，清除输入框内容
     if (route.params?.clearData) {
@@ -67,6 +83,26 @@ const Login = () => {
       setPassword('');
       setErrors({});
     }
+    
+    // 监听键盘显示和隐藏事件
+    const keyboardDidShowListener = Keyboard.addListener(
+      'keyboardDidShow',
+      () => {
+        setKeyboardVisible(true);
+      }
+    );
+    const keyboardDidHideListener = Keyboard.addListener(
+      'keyboardDidHide',
+      () => {
+        setKeyboardVisible(false);
+      }
+    );
+
+    // 清理监听器
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
   }, [route.params?.clearData]);
 
   // 处理用户名变更
@@ -84,17 +120,22 @@ const Login = () => {
       setErrors(prev => ({ ...prev, password: null }));
     }
   };
+  
+  // 切换密码可见性
+  const toggleSecureEntry = () => {
+    setSecureTextEntry(!secureTextEntry);
+  };
 
   // 表单验证
   const validate = (loginUsername, loginPassword) => {
     const newErrors = {};
     
     if (!loginUsername?.trim()) {
-      newErrors.username = '请输入用户名';
+      newErrors.username = 'Please enter username';
     }
     
     if (!loginPassword?.trim()) {
-      newErrors.password = '请输入密码';
+      newErrors.password = 'Please enter password';
     }
     
     setErrors(newErrors);
@@ -102,8 +143,8 @@ const Login = () => {
   };
 
   // 登录处理
-  const handleLogin = async (loginUsername = username, loginPassword = password) => {
-    if (!validate(loginUsername, loginPassword)) {
+  const handleLogin = async () => {
+    if (!validate(username, password)) {
       return;
     }
     
@@ -117,8 +158,8 @@ const Login = () => {
           'Accept': 'application/json'
         },
         body: JSON.stringify({ 
-          username: loginUsername, 
-          password: loginPassword 
+          username: username, 
+          password: password 
         })
       });
       
@@ -135,12 +176,12 @@ const Login = () => {
         });
       } else {
         // 登录失败，显示错误信息
-        Alert.alert('登录失败', data.message || '用户名或密码错误');
+        Alert.alert('Login failed', data.message || 'Wrong username or password');
       }
     } catch (error) {
       Alert.alert(
-        '连接错误', 
-        '无法连接到服务器，请检查网络连接'
+        'Connection error', 
+        'Unable to connect to the server'
       );
     } finally {
       setIsLoading(false);
@@ -150,99 +191,160 @@ const Login = () => {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
-        <StatusBar barStyle="light-content" backgroundColor={COLORS.dark} />
+        <StatusBar barStyle="light-content" backgroundColor="#0F172A" />
         
         <LoginBackground />
         
-        {/* Logo区域 */}
+        {/* 闪光效果 */}
         <Animated.View 
           style={[
-            styles.logoContainer,
+            styles.shine,
             {
-              opacity: logoAnim,
-              transform: [
-                { 
-                  translateY: logoAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [-50, 0]
-                  })
-                },
-                {
-                  scale: logoAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0.5, 1]
-                  })
-                }
-              ]
+              transform: [{ translateX: shineAnim }]
             }
           ]}
-        >
-          <View style={styles.logoWrapper}>
-            <Image 
-              source={require('../../assets/logo.png')} 
-              style={styles.logo}
-              resizeMode="contain"
-            />
-          </View>
-          <Text style={styles.welcomeText}>WELCOME TO HONG SENG</Text>
-          <Text style={styles.subtitleText}>Sign in to continue</Text>
-        </Animated.View>
+        />
 
-        {/* 表单区域 */}
-        <KeyboardAvoidingView 
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-          style={styles.formContainer}
+        <ScrollView 
+          ref={scrollViewRef}
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
         >
+          {/* Logo区域 */}
           <Animated.View 
             style={[
-              styles.formCard,
+              styles.logoContainer,
+              keyboardVisible && styles.logoContainerSmall,
               {
-                opacity: formAnim,
+                opacity: logoAnim,
                 transform: [
                   { 
-                    translateY: formAnim.interpolate({
+                    translateY: logoAnim.interpolate({
                       inputRange: [0, 1],
-                      outputRange: [100, 0]
+                      outputRange: [-50, 0]
                     })
                   }
                 ]
               }
             ]}
           >
-            <Input
-              label="Username"
-              value={username}
-              onChangeText={handleUsernameChange}
-              placeholder="Enter your username"
-              error={errors.username}
-              autoCapitalize="none"
-              iconLeft={<Ionicons name="person-outline" size={20} color={COLORS.primary} />}
-            />
-            
-            <Input
-              label="Password"
-              value={password}
-              onChangeText={handlePasswordChange}
-              secureTextEntry
-              placeholder="Enter your password"
-              error={errors.password}
-              iconLeft={<Ionicons name="lock-closed-outline" size={20} color={COLORS.primary} />}
-            />
-            
-            <Button
-              label="LOGIN"
-              onPress={() => handleLogin()}
-              isLoading={isLoading}
-              style={styles.loginButton}
-              rightIcon={<Ionicons name="arrow-forward" size={20} color={COLORS.white} />}
-            />
-            
-            <View style={styles.footerTextContainer}>
-              <Text style={styles.footerText}>© {new Date().getFullYear()} Hong Seng Group</Text>
-              <Text style={styles.footerVersion}>v1.0.0</Text>
+            <View style={[
+              styles.logoWrapper,
+              keyboardVisible && styles.logoWrapperSmall
+            ]}>
+              <Image 
+                source={require('../../assets/logo.png')} 
+                style={[
+                  styles.logo,
+                  keyboardVisible && styles.logoSmall
+                ]}
+                resizeMode="contain"
+              />
             </View>
+            <Text style={[
+              styles.welcomeText,
+              keyboardVisible && styles.welcomeTextSmall
+            ]}>HONG SENG</Text>
+            <Text style={[
+              styles.subtitleText,
+              keyboardVisible && styles.subtitleTextSmall
+            ]}>Sign in to your account</Text>
           </Animated.View>
-        </KeyboardAvoidingView>
+
+          {/* 表单区域 */}
+          <KeyboardAvoidingView 
+            behavior={Platform.OS === 'ios' ? 'padding' : null}
+            style={styles.formContainer}
+          >
+            <Animated.View 
+              style={[
+                styles.formCard,
+                {
+                  opacity: formAnim,
+                  transform: [
+                    { 
+                      translateY: formAnim.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [100, 0]
+                      })
+                    }
+                  ]
+                }
+              ]}
+            >
+              {/* Username Input */}
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Username</Text>
+                <View style={[styles.inputWrapper, errors.username && styles.inputError]}>
+                  <Ionicons name="person-outline" size={20} color="#64748B" style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    value={username}
+                    onChangeText={handleUsernameChange}
+                    placeholder="Enter your username"
+                    placeholderTextColor="#94A3B8"
+                    autoCapitalize="none"
+                  />
+                </View>
+                {errors.username && <Text style={styles.errorText}>{errors.username}</Text>}
+              </View>
+              
+              {/* Password Input */}
+              <View style={styles.inputContainer}>
+                <Text style={styles.inputLabel}>Password</Text>
+                <View style={[styles.inputWrapper, errors.password && styles.inputError]}>
+                  <Ionicons name="lock-closed-outline" size={20} color="#64748B" style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    value={password}
+                    onChangeText={handlePasswordChange}
+                    secureTextEntry={secureTextEntry}
+                    placeholder="Enter your password"
+                    placeholderTextColor="#94A3B8"
+                  />
+                  <TouchableOpacity onPress={toggleSecureEntry} style={styles.visibilityIcon}>
+                    <Ionicons 
+                      name={secureTextEntry ? "eye-outline" : "eye-off-outline"} 
+                      size={20} 
+                      color="#64748B" 
+                    />
+                  </TouchableOpacity>
+                </View>
+                {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+              </View>
+              
+              {/* Login Button */}
+              <TouchableOpacity
+                style={[styles.loginButton, isLoading && styles.loginButtonDisabled]}
+                onPress={handleLogin}
+                disabled={isLoading}
+                activeOpacity={0.8}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : (
+                  <>
+                    <Text style={styles.loginButtonText}>LOG IN</Text>
+                    <Ionicons name="arrow-forward" size={20} color="#FFFFFF" />
+                  </>
+                )}
+              </TouchableOpacity>
+              
+              <View style={styles.registerContainer}>
+                <Text style={styles.registerText}>Don't have an account?</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('Register')}>
+                  <Text style={styles.registerButtonText}>Register</Text>
+                </TouchableOpacity>
+              </View>
+              
+              <View style={styles.footerTextContainer}>
+                <Text style={styles.footerText}>© {new Date().getFullYear()} Hong Seng Group</Text>
+                <Text style={styles.footerVersion}>v1.0.0</Text>
+              </View>
+            </Animated.View>
+          </KeyboardAvoidingView>
+        </ScrollView>
       </View>
     </TouchableWithoutFeedback>
   );
@@ -252,65 +354,185 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  scrollContainer: {
+    flexGrow: 1,
+    paddingBottom: 20,
+  },
+  shine: {
+    position: 'absolute',
+    width: 50,
+    height: height,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    transform: [{ skewX: '-25deg' }],
+  },
   logoContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: height * 0.08,
+    marginTop: height * 0.1,
+    paddingHorizontal: 20,
+  },
+  logoContainerSmall: {
+    marginTop: Platform.OS === 'ios' ? 15 : 5,
+    paddingTop: 5,
+    paddingBottom: 5,
   },
   logoWrapper: {
-    width: width * 0.35,
-    height: width * 0.35,
-    borderRadius: width * 0.35 / 2,
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    width: width * 0.3,
+    height: width * 0.3,
+    borderRadius: width * 0.15,
+    backgroundColor: 'rgba(255, 255, 255, 0.95)',
     alignItems: 'center',
     justifyContent: 'center',
-    ...SHADOWS.dark,
-    marginBottom: SPACING.md,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+    marginBottom: 24,
+  },
+  logoWrapperSmall: {
+    width: width * 0.2,
+    height: width * 0.2,
+    borderRadius: width * 0.1,
+    marginBottom: 12,
   },
   logo: {
-    width: width * 0.25,
-    height: width * 0.25,
+    width: width * 0.22,
+    height: width * 0.22,
+  },
+  logoSmall: {
+    width: width * 0.15,
+    height: width * 0.15,
   },
   welcomeText: {
-    color: COLORS.white,
-    fontSize: SIZES.large,
+    color: '#FFFFFF',
+    fontSize: 26,
     fontWeight: 'bold',
-    marginVertical: SPACING.xs,
-    letterSpacing: 1,
+    letterSpacing: 2,
+    marginBottom: 8,
+  },
+  welcomeTextSmall: {
+    fontSize: 20,
+    marginBottom: 4,
   },
   subtitleText: {
-    color: 'rgba(255, 255, 255, 0.8)',
-    fontSize: SIZES.medium,
+    color: 'rgba(255, 255, 255, 0.75)',
+    fontSize: 16,
+  },
+  subtitleTextSmall: {
+    fontSize: 14,
+    marginBottom: 5,
   },
   formContainer: {
     flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: SPACING.container,
-    marginTop: SPACING.xxl,
+    paddingHorizontal: 24,
+    marginTop: 20,
   },
   formCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 20,
-    padding: SPACING.xl,
-    ...SHADOWS.dark,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 10,
+  },
+  inputContainer: {
+    marginBottom: 20,
+  },
+  inputLabel: {
+    color: '#1E293B',
+    fontWeight: '600',
+    marginBottom: 8,
+    fontSize: 14,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
+    backgroundColor: '#F8FAFC',
+    paddingHorizontal: 12,
+    height: 52,
+  },
+  inputError: {
+    borderColor: '#EF4444',
+    borderWidth: 1.5,
+  },
+  inputIcon: {
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
+    color: '#1E293B',
+    fontSize: 15,
+    paddingVertical: 12,
+  },
+  visibilityIcon: {
+    padding: 8,
+  },
+  errorText: {
+    color: '#EF4444',
+    fontSize: 12,
+    marginTop: 5,
+    marginLeft: 4,
   },
   loginButton: {
-    marginTop: SPACING.lg,
+    height: 56,
+    backgroundColor: '#2563EB',
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+    shadowColor: "#2563EB",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  loginButtonDisabled: {
+    backgroundColor: '#93C5FD',
+  },
+  loginButtonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginRight: 8,
+    letterSpacing: 1,
+  },
+  registerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  registerText: {
+    color: '#64748B',
+    fontSize: 14,
+  },
+  registerButtonText: {
+    color: '#2563EB',
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 5,
   },
   footerTextContainer: {
-    marginTop: SPACING.xl,
+    marginTop: 32,
     alignItems: 'center',
   },
   footerText: {
-    color: COLORS.darkGray,
-    fontSize: SIZES.small,
+    color: '#64748B',
+    fontSize: 12,
     textAlign: 'center',
   },
   footerVersion: {
-    color: COLORS.gray,
-    fontSize: SIZES.small * 0.8,
-    marginTop: 5,
-  }
+    color: '#94A3B8',
+    fontSize: 10,
+    marginTop: 4,
+  },
 });
 
 export default Login; 

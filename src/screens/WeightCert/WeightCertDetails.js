@@ -23,12 +23,12 @@ const TabButton = ({ icon, label, active, onPress }) => (
     <Ionicons
       name={icon}
       size={24}
-      color={active ? COLORS.primary : COLORS.gray}
+      color={active ? '#F43F5E' : COLORS.gray}
     />
     <Text
       style={[
         styles.tabLabel,
-        { color: active ? COLORS.primary : COLORS.gray },
+        { color: active ? '#F43F5E' : COLORS.gray },
       ]}
     >
       {label}
@@ -212,11 +212,11 @@ const WeightCertDetails = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.dark} />
+      <StatusBar barStyle="light-content" backgroundColor="#F43F5E" />
 
       {/* Header */}
       <LinearGradient
-        colors={[COLORS.primary, COLORS.secondary]}
+        colors={['#F43F5E', '#FB7185']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.header}
@@ -227,7 +227,7 @@ const WeightCertDetails = () => {
         >
           <Ionicons name="arrow-back" size={24} color={COLORS.white} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{cert.model_id}</Text>
+        <Text style={styles.headerTitle}>{cert.model_id || 'Weight Certificate'}</Text>
       </LinearGradient>
 
       {/* Tab Bar */}
@@ -298,7 +298,7 @@ const styles = StyleSheet.create({
   },
   tabButtonActive: {
     borderBottomWidth: 2,
-    borderBottomColor: COLORS.primary,
+    borderBottomColor: '#F43F5E',
   },
   tabLabel: {
     fontSize: SIZES.small,

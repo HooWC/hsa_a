@@ -73,35 +73,41 @@ const formatLabel = (key) => {
 
 // 格式化值，特别处理日期和可能的特殊值
 const formatValue = (key, value) => {
-  if (value === null || value === undefined) return '-';
+  if (value === null || value === undefined || value.toString().trim() === '') return '-';
 
-  // 处理布尔值
   if (typeof value === 'boolean') {
-    return value ? '是' : '否';
+      return value ? 'TRUE' : 'FALSE';
   }
-  
-  // 处理Buffer数据
+
   if (value && typeof value === 'object' && value.type === 'Buffer') {
-    return '[Buffer数据]';
+      return '[Buffer数据]';
   }
 
-  // 检查是否为 ISO 8601 日期格式 (YYYY-MM-DDTHH:mm:ss.sssZ)
+  // 解析 ISO 8601 日期格式，并转换为 UTC
   if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)) {
-    const date = new Date(value);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-  }
-
-  // 处理字段名包含 "date" 或 "dt" 的情况
-  if ((key.toLowerCase().includes("date") || key.toLowerCase().includes("dt")) && value) {
-    try {
       const date = new Date(value);
-      if (!isNaN(date.getTime())) {
-        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-      }
-    } catch (e) {}
+      return date.getUTCFullYear() + '-' + 
+             String(date.getUTCMonth() + 1).padStart(2, '0') + '-' + 
+             String(date.getUTCDate()).padStart(2, '0') + ' ' +
+             String(date.getUTCHours()).padStart(2, '0') + ':' + 
+             String(date.getUTCMinutes()).padStart(2, '0')
   }
 
-  return value.toString();
+  if ((key.toLowerCase().includes("date") || key.toLowerCase().includes("dt")) && value) {
+      try {
+          const date = new Date(value);
+          if (!isNaN(date.getTime())) {
+              return date.getUTCFullYear() + '-' + 
+                     String(date.getUTCMonth() + 1).padStart(2, '0') + '-' + 
+                     String(date.getUTCDate()).padStart(2, '0') + ' ' +
+                     String(date.getUTCHours()).padStart(2, '0') + ':' + 
+                     String(date.getUTCMinutes()).padStart(2, '0') + ':' + 
+                     String(date.getUTCSeconds()).padStart(2, '0');
+          }
+      } catch (e) {}
+  }
+
+  return value.toString().trim();
 };
 
 const styles = StyleSheet.create({
@@ -148,8 +154,10 @@ const styles = StyleSheet.create({
   },
   infoRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SPACING.sm,
+    justifyContent: 'space-between',
+    paddingVertical: SPACING.xs,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
   },
   infoLabel: {
     width: width * 0.4,

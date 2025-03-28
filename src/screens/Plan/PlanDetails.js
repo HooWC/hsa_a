@@ -89,11 +89,11 @@ const PlanDetails = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.dark} />
+      <StatusBar barStyle="light-content" backgroundColor="#0F172A" />
 
       {/* Header */}
       <LinearGradient
-        colors={[COLORS.primary, COLORS.secondary]}
+        colors={['#0F172A', '#334155']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.header}
@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   planButton: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: '#334155',
     paddingHorizontal: SPACING.md,
     paddingVertical: SPACING.xs,
     borderRadius: RADIUS.sm,
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: SIZES.medium,
     fontWeight: 'bold',
-    color: COLORS.primary,
+    color: '#1E293B',
     marginBottom: SPACING.sm,
   },
   detailRow: {
@@ -207,7 +207,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: SIZES.medium,
     fontWeight: 'bold',
-    color: COLORS.darkGray,
+    color: '#1E293B',
     marginBottom: SPACING.sm,
   },
   infoRow: {

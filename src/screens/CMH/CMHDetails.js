@@ -26,12 +26,12 @@ const TabButton = ({ icon, label, active, onPress }) => (
     <Ionicons
       name={icon}
       size={24}
-      color={active ? COLORS.primary : COLORS.gray}
+      color={active ? '#2563EB' : COLORS.gray}
     />
     <Text
       style={[
         styles.tabLabel,
-        { color: active ? COLORS.primary : COLORS.gray },
+        { color: active ? '#2563EB' : COLORS.gray },
       ]}
     >
       {label}
@@ -200,7 +200,12 @@ const CMHDetails = () => {
                   {chassisItem.chassismh_id}
                 </Text>
                 <Text style={styles.chassisEntryDate}>
-                  {chassisItem.ddate ? new Date(chassisItem.ddate).toLocaleDateString() : '-'}
+                {chassisItem.ddate ? (() => {
+    const date = new Date(chassisItem.ddate);
+    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')} ` +
+           `${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`;
+})() : '-'}
+
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={24} color={COLORS.primary} />
@@ -250,7 +255,11 @@ const CMHDetails = () => {
                   {item.quot_id}
                 </Text>
                 <Text style={styles.chassisEntryDate}>
-                  {item.ddate ? new Date(item.ddate).toLocaleDateString() : '-'}
+                  {item.valid_fr ? (() => {
+    const date = new Date(item.ddate); // 解析 ISO 日期
+    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')} ` +
+           `${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`;
+})() : 'N/A'}
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={24} color={COLORS.primary} />
@@ -290,7 +299,11 @@ const CMHDetails = () => {
                   {item.so_id}
                 </Text>
                 <Text style={styles.chassisEntryDate}>
-                  {item.ddate ? new Date(item.ddate).toLocaleDateString() : 'N/A'}
+                {item.ddate ? (() => {
+    const date = new Date(item.ddate); // 解析 ISO 日期
+    return `${date.getUTCFullYear()}-${String(date.getUTCMonth() + 1).padStart(2, '0')}-${String(date.getUTCDate()).padStart(2, '0')} ` +
+           `${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`;
+})() : 'N/A'}
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={24} color={COLORS.primary} />
@@ -323,33 +336,35 @@ const CMHDetails = () => {
         </View>
       ) : (
         <>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Document Files</Text>
-            {chassisfileData && chassisfileData.length > 0 ? (
-              chassisfileData.map((item, index) => (
-                <View key={`${item.id}-${index}`} style={styles.historyItem}>
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>File Name</Text>
-                    <Text style={styles.infoValue}>{item.file_name || 'N/A'}</Text>
-                  </View>
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>File Type</Text>
-                    <Text style={styles.infoValue}>{item.file_type || 'N/A'}</Text>
-                  </View>
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Upload Date</Text>
-                    <Text style={styles.infoValue}>{item.upload_date ? new Date(item.upload_date).toLocaleDateString() : 'N/A'}</Text>
-                  </View>
-                  <View style={styles.infoRow}>
-                    <Text style={styles.infoLabel}>Path</Text>
-                    <Text style={styles.infoValue}>{item.file_path || 'N/A'}</Text>
-                  </View>
-                </View>
-              ))
-            ) : (
-              <Text style={styles.noDataText}>No document files available</Text>
-            )}
+        <View style={styles.section}>
+  <Text style={styles.sectionTitle}>Document Files Information</Text>
+  {chassisfileData && chassisfileData.length > 0 && chassisfileData.some(item => 
+    Object.values(item).some(value => value !== null && value !== '')
+  ) ? (
+    chassisfileData
+      .filter(item => Object.values(item).some(value => value !== null && value !== ''))
+      .map((item, index) => (
+        <TouchableOpacity
+          key={`file-${index}`}
+          style={styles.fileItemCard}
+          onPress={() => navigation.navigate('FileDetailScreen', { fileData: item })}
+        >
+          <View style={styles.fileItemHeader}>
+            <Text style={styles.fileItemId}>File #{item.pk || '-'}</Text>
+            <Text style={styles.fileItemName} numberOfLines={1} ellipsizeMode="tail">
+              {item.doctype || 'Unnamed File'}
+            </Text>
           </View>
+          <View style={styles.fileItemFooter}>
+            <Ionicons name="chevron-forward" size={24} color={COLORS.gray} />
+          </View>
+        </TouchableOpacity>
+      ))
+  ) : (
+    <Text style={styles.noDataText}>No document files available</Text>
+  )}
+</View>
+
         </>
       )}
     </View>
@@ -357,11 +372,11 @@ const CMHDetails = () => {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.dark} />
+      <StatusBar barStyle="light-content" backgroundColor="#2563EB" />
 
       {/* Header */}
       <LinearGradient
-        colors={[COLORS.primary, COLORS.secondary]}
+        colors={['#2563EB', '#3B82F6']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.header}
@@ -467,7 +482,7 @@ const styles = StyleSheet.create({
     borderBottomColor: 'transparent',
   },
   tabButtonActive: {
-    borderBottomColor: COLORS.primary,
+    borderBottomColor: '#2563EB',
   },
   tabLabel: {
     marginTop: SPACING.xs,
@@ -490,7 +505,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: SIZES.medium,
     fontWeight: 'bold',
-    color: COLORS.primary,
+    color: '#2563EB',
     marginBottom: SPACING.md,
     paddingBottom: SPACING.xs,
     borderBottomWidth: 1,
@@ -498,8 +513,10 @@ const styles = StyleSheet.create({
   },
   infoRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SPACING.sm,
+    justifyContent: 'space-between',
+    paddingVertical: SPACING.xs,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
   },
   infoLabel: {
     width: width * 0.4,
@@ -544,7 +561,7 @@ const styles = StyleSheet.create({
   historyDate: {
     fontSize: SIZES.small,
     fontWeight: 'bold',
-    color: COLORS.primary,
+    color: '#2563EB',
   },
   noDataText: {
     fontSize: SIZES.md,
@@ -559,7 +576,7 @@ const styles = StyleSheet.create({
   chassisEntryTitle: {
     fontSize: SIZES.small,
     fontWeight: 'bold',
-    color: COLORS.primary,
+    color: '#2563EB',
   },
   chassisEntryDate: {
     fontSize: SIZES.small,
@@ -570,6 +587,37 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  fileItemCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: RADIUS.md,
+    marginBottom: SPACING.sm,
+    padding: SPACING.md,
+    ...SHADOWS.light,
+  },
+  fileItemHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: SPACING.xs,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F0F0F0',
+  },
+  fileItemId: {
+    fontSize: SIZES.small,
+    fontWeight: 'bold',
+    color: '#2563EB',
+    flex: 0.3,
+  },
+  fileItemName: {
+    fontSize: SIZES.small,
+    color: COLORS.darkGray,
+    flex: 0.7,
+    textAlign: 'right',
+  },
+  fileItemFooter: {
+    paddingTop: SPACING.xs,
+    alignItems: 'flex-end',
   },
 });
 

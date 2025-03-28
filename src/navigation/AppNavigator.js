@@ -4,6 +4,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 import Login from '../screens/Login';
+import Register from '../screens/Register';
 import Home from '../screens/Home';
 import WeightCertListing from '../screens/WeightCert/WeightCertListing';
 import WeightCertDetails from '../screens/WeightCert/WeightCertDetails';
@@ -15,6 +16,7 @@ import CMHDetails from '../screens/CMH/CMHDetails';
 import ChassisItemDetail from '../screens/CMH/ChassisItemDetail';
 import SODetail from '../screens/CMH/SODetail';
 import QuotDetail from '../screens/CMH/QuotDetail';
+import FileDetailScreen from '../screens/CMH/FileDetailScreen';
 
 const Stack = createStackNavigator();
 
@@ -48,6 +50,10 @@ const AppNavigator = () => {
           <Stack.Screen 
             name="Login" 
             component={Login}
+          />
+          <Stack.Screen 
+            name="Register" 
+            component={Register}
           />
           <Stack.Screen 
             name="Home" 
@@ -92,6 +98,10 @@ const AppNavigator = () => {
           <Stack.Screen 
             name="QuotDetail" 
             component={QuotDetail}
+          />
+          <Stack.Screen 
+            name="FileDetailScreen" 
+            component={FileDetailScreen}
           />
         </Stack.Navigator>
       </NavigationContainer>

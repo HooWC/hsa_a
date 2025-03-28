@@ -9,12 +9,93 @@ import {
   StatusBar,
   ActivityIndicator,
   RefreshControl,
+  Animated,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SPACING, SIZES, SHADOWS, RADIUS } from '../../constants/theme';
+
+// 提取成单独的组件，这样就可以在组件内部使用hooks
+const PlanItem = ({ item, index, navigation }) => {
+  const itemFadeAnim = React.useRef(new Animated.Value(0)).current;
+  
+  React.useEffect(() => {
+    // 为每个项目单独设置动画
+    Animated.timing(itemFadeAnim, {
+      toValue: 1,
+      duration: 300,
+      delay: index * 50,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+  
+  const animatedStyle = {
+    opacity: itemFadeAnim,
+    transform: [{ 
+      translateY: itemFadeAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [20, 0]
+      })
+    }]
+  };
+  
+  return (
+    <Animated.View style={animatedStyle}>
+      <TouchableOpacity
+        style={styles.card}
+        activeOpacity={0.7}
+        onPress={() => navigation.navigate('PlanDetails', { plan: item })}
+      >
+        <LinearGradient
+          colors={['rgba(15, 23, 42, 0.05)', 'rgba(255, 255, 255, 0)']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.cardGradient}
+        >
+          <View style={styles.cardHeader}>
+            <View style={styles.cardHeaderLeft}>
+              <Ionicons name="clipboard" size={22} color="#1E293B" style={styles.cardIcon} />
+              <Text style={styles.cardId}>Plan #{' '}
+                <Text style={styles.cardIdValue}>{item.plan_id || '-'}</Text>
+              </Text>
+            </View>
+            <View style={styles.cardBadge}>
+              <Text style={styles.cardBadgeText}>MID: {item.model_id || 'N/A'}</Text>
+            </View>
+          </View>
+          
+          <View style={styles.cardContent}>
+            <View style={styles.cardRowsContainer}>
+              <View style={[styles.cardRow, styles.bodyTypeRow]}>
+                <Text style={styles.cardLabel}>Body Type</Text>
+                <Text style={[styles.cardValue, styles.bodyTypeValue]} numberOfLines={2}>
+                  {item.body_type?.length > 50 
+                    ? item.body_type.substring(0, 50) + '...' 
+                    : item.body_type || '-'}
+                </Text>
+              </View>
+              <View style={styles.cardRow}>
+                <Text style={styles.cardLabel}>BDM</Text>
+                <Text style={styles.cardValue}>{item.bdm || '-'}</Text>
+              </View>
+              <View style={styles.cardRow}>
+                <Text style={styles.cardLabel}>Wheelbase</Text>
+                <Text style={styles.cardValue}>{item.wheelbase || '-'}</Text>
+              </View>
+            </View>
+          </View>
+          
+          <View style={styles.cardFooter}>
+            <Text style={styles.viewDetailsText}>View Details</Text>
+            <Ionicons name="chevron-forward-circle" size={22} color="#1E293B" />
+          </View>
+        </LinearGradient>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
 
 const PlanListing = () => {
   const navigation = useNavigation();
@@ -27,7 +108,7 @@ const PlanListing = () => {
   const fetchPlans = async () => {
     try {
       const token = await AsyncStorage.getItem('userToken');
-      console.log('Token:', token);
+      //console.log('Token:', token);
 
       const response = await fetch('http://10.10.10.14:5000/plans', {
         method: 'GET',
@@ -38,8 +119,9 @@ const PlanListing = () => {
       });
 
       const data = await response.json();
-      console.log('Plans data:', data);
+      //console.log('Plans data:', data);
       setPlans(data);
+      
     } catch (err) {
       console.error('Error:', err);
       setError('获取数据失败');
@@ -67,112 +149,74 @@ const PlanListing = () => {
     const searchLower = searchQuery.toLowerCase();
     
     return (
-      (plan.plan_id && plan.plan_id.toString().toLowerCase().includes(searchLower)) ||
-      (plan.model_id && plan.model_id.toString().toLowerCase().includes(searchLower)) ||
-      (plan.body_type && plan.body_type.toString().toLowerCase().includes(searchLower)) ||
-      (plan.bdm && plan.bdm.toString().toLowerCase().includes(searchLower)) ||
-      (plan.wheelbase && plan.wheelbase.toString().toLowerCase().includes(searchLower))
+      (plan.plan_id && String(plan.plan_id).toLowerCase().includes(searchLower)) ||
+      (plan.model_id && String(plan.model_id).toLowerCase().includes(searchLower)) ||
+      (plan.body_type && String(plan.body_type).toLowerCase().includes(searchLower)) ||
+      (plan.bdm && String(plan.bdm).toLowerCase().includes(searchLower)) ||
+      (plan.wheelbase && String(plan.wheelbase).toLowerCase().includes(searchLower))
     );
   });
 
-  const renderPlan = ({ item }) => {
+  // 使用单独的组件
+  const renderPlan = ({ item, index }) => {
     if (!item) return null;
-    
-    return (
-      <TouchableOpacity
-        style={styles.card}
-        onPress={() => navigation.navigate('PlanDetails', { plan: item })}
-      >
-        <View style={styles.cardHeader}>
-          <Text style={styles.cardId}>Plan #</Text>
-          <Text style={styles.cardDate}>
-            {item.plan_id || '-'}
-          </Text>
-        </View>
-        <View style={styles.cardContent}>
-          <View style={styles.cardRow}>
-            <Text style={styles.cardLabel}>Model</Text>
-            <Text style={styles.cardValue}>{item.model_id || '-'}</Text>
-          </View>
-          <View style={[styles.cardRow, styles.bodyTypeRow]}>
-            <Text style={styles.cardLabel}>Body Type</Text>
-            <View style={styles.bodyTypeContainer}>
-              <Text style={[styles.cardValue, styles.bodyTypeValue]} numberOfLines={2}>
-                {item.body_type?.length > 50 
-                  ? item.body_type.substring(0, 50) + '...' 
-                  : item.body_type || '-'}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.cardRow}>
-            <Text style={styles.cardLabel}>BDM</Text>
-            <Text style={styles.cardValue}>{item.bdm || '-'}</Text>
-          </View>
-          <View style={styles.cardRow}>
-            <Text style={styles.cardLabel}>Wheelbase</Text>
-            <Text style={styles.cardValue}>{item.wheelbase || '-'}</Text>
-          </View>
-        </View>
-        <View style={styles.cardFooter}>
-          <Ionicons name="chevron-forward" size={24} color={COLORS.gray} />
-        </View>
-      </TouchableOpacity>
-    );
+    return <PlanItem item={item} index={index} navigation={navigation} />;
   };
 
   if (loading && !refreshing) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={COLORS.primary} />
-        <Text style={styles.loadingText}>Loading...</Text>
+        <ActivityIndicator size="large" color="#1E293B" />
+        <Text style={styles.loadingText}>Loading plans...</Text>
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor={COLORS.dark} />
+      <StatusBar backgroundColor="#0F172A" barStyle="light-content" />
 
-      {/* Header */}
       <LinearGradient
-        colors={[COLORS.primary, COLORS.secondary]}
+        colors={['#0F172A', '#334155']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={styles.header}
       >
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Ionicons name="arrow-back" size={24} color={COLORS.white} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Plan Listing</Text>
+        <View style={styles.headerContent}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Plan List</Text>
+          <View style={styles.headerRight}></View>
+        </View>
       </LinearGradient>
 
       {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color={COLORS.gray} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Search"
-          value={searchQuery}
-          onChangeText={handleSearch}
-          placeholderTextColor={COLORS.gray}
-        />
-        {searchQuery.length > 0 && (
-          <TouchableOpacity
-            onPress={() => setSearchQuery('')}
-            style={styles.clearButton}
-          >
-            <Ionicons name="close-circle" size={20} color={COLORS.gray} />
-          </TouchableOpacity>
-        )}
+      <View style={styles.searchWrapper}>
+        <View style={styles.searchContainer}>
+          <Ionicons name="search" size={20} color="#64748B" />
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search"
+            value={searchQuery}
+            onChangeText={handleSearch}
+            placeholderTextColor="#64748B"
+          />
+          {searchQuery.length > 0 && (
+            <TouchableOpacity
+              onPress={() => setSearchQuery('')}
+              style={styles.clearButton}
+            >
+              <Ionicons name="close-circle" size={20} color="#64748B" />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       {/* Error Message */}
       {error && (
         <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle" size={24} color={COLORS.error} />
+          <Ionicons name="alert-circle" size={24} color="#EF4444" />
           <Text style={styles.errorText}>{error}</Text>
         </View>
       )}
@@ -181,16 +225,28 @@ const PlanListing = () => {
       <FlatList
         data={filteredPlans}
         renderItem={renderPlan}
-        keyExtractor={item => item.id?.toString()}
+        keyExtractor={(item, index) => `${item.id || index}`}
         contentContainerStyle={styles.listContainer}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl 
+            refreshing={refreshing} 
+            onRefresh={onRefresh}
+            colors={['#1E293B']} 
+            progressBackgroundColor="#f1f5f9"
+          />
         }
+        showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           !error && (
             <View style={styles.emptyContainer}>
-              <Ionicons name="document-text-outline" size={48} color={COLORS.gray} />
+              <Ionicons name="document-text-outline" size={60} color="#94a3b8" />
               <Text style={styles.emptyText}>No plans found</Text>
+              <TouchableOpacity 
+                style={[styles.emptyButton, { backgroundColor: '#1E293B' }]} 
+                onPress={onRefresh}
+              >
+                <Text style={styles.emptyButtonText}>Refresh</Text>
+              </TouchableOpacity>
             </View>
           )
         }
@@ -202,18 +258,19 @@ const PlanListing = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: '#F8FAFC',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.background,
+    backgroundColor: '#F8FAFC',
   },
   loadingText: {
     marginTop: SPACING.md,
     fontSize: SIZES.medium,
-    color: COLORS.gray,
+    color: '#64748B',
+    fontWeight: '500',
   },
   header: {
     height: 60,
@@ -221,6 +278,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: SPACING.md,
     ...SHADOWS.medium,
+  },
+  headerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   backButton: {
     marginRight: SPACING.sm,
@@ -232,21 +294,30 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     flex: 1,
   },
+  headerRight: {
+    width: 24,
+    height: 24,
+  },
+  searchWrapper: {
+    paddingHorizontal: SPACING.md,
+    paddingTop: SPACING.md,
+    paddingBottom: 4,
+    backgroundColor: '#F8FAFC',
+  },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.white,
-    margin: SPACING.md,
     paddingHorizontal: SPACING.md,
-    borderRadius: RADIUS.md,
-    ...SHADOWS.light,
+    borderRadius: RADIUS.lg,
+    ...SHADOWS.small,
   },
   searchInput: {
     flex: 1,
-    height: 44,
+    height: 46,
     marginLeft: SPACING.sm,
     fontSize: SIZES.medium,
-    color: COLORS.darkGray,
+    color: '#1E293B',
   },
   clearButton: {
     padding: SPACING.xs,
@@ -254,24 +325,32 @@ const styles = StyleSheet.create({
   errorContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#FEF2F2',
     margin: SPACING.md,
     padding: SPACING.md,
-    borderRadius: RADIUS.md,
+    borderRadius: RADIUS.lg,
+    borderLeftWidth: 4,
+    borderLeftColor: '#EF4444',
   },
   errorText: {
     marginLeft: SPACING.sm,
-    color: COLORS.error,
+    color: '#B91C1C',
     fontSize: SIZES.medium,
+    fontWeight: '500',
   },
   listContainer: {
     padding: SPACING.md,
+    paddingBottom: 100,
   },
   card: {
     backgroundColor: COLORS.white,
-    borderRadius: RADIUS.md,
+    borderRadius: RADIUS.lg,
     marginBottom: SPACING.md,
-    ...SHADOWS.light,
+    overflow: 'hidden',
+    ...SHADOWS.medium,
+  },
+  cardGradient: {
+    borderRadius: RADIUS.lg,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -279,64 +358,100 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: '#F1F5F9',
   },
-  cardDate: {
-    fontSize: SIZES.small,
-    color: COLORS.gray,
+  cardHeaderLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  cardIcon: {
+    marginRight: 8,
   },
   cardId: {
-    fontSize: SIZES.medium,
-    fontWeight: 'bold',
-    color: COLORS.primary,
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#64748B',
+  },
+  cardIdValue: {
+    fontWeight: '700',
+    color: '#1E293B',
+  },
+  cardBadge: {
+    backgroundColor: 'rgba(15, 23, 42, 0.1)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+  },
+  cardBadgeText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#1E293B',
   },
   cardContent: {
     padding: SPACING.md,
   },
+  cardRowsContainer: {
+    marginBottom: 4,
+  },
   cardRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: SPACING.xs,
+    marginBottom: 8,
   },
   cardLabel: {
     fontSize: SIZES.small,
-    color: COLORS.gray,
+    color: '#64748B',
+    fontWeight: '500',
   },
   cardValue: {
     fontSize: SIZES.small,
-    color: COLORS.darkGray,
-    fontWeight: '500',
+    color: '#1E293B',
+    fontWeight: '600',
+    maxWidth: '60%',
+    textAlign: 'right',
+  },
+  bodyTypeRow: {
+    alignItems: 'flex-start',
+  },
+  bodyTypeValue: {
+    flexWrap: 'wrap',
+    lineHeight: 18,
   },
   cardFooter: {
-    padding: SPACING.md,
-    alignItems: 'flex-end',
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    paddingHorizontal: SPACING.md,
+    paddingBottom: SPACING.md,
+  },
+  viewDetailsText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#1E293B',
   },
   emptyContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: SPACING.xl,
+    marginTop: SPACING.xxl,
   },
   emptyText: {
     marginTop: SPACING.md,
     fontSize: SIZES.medium,
-    color: COLORS.gray,
+    color: '#64748B',
+    marginBottom: SPACING.md,
   },
-  bodyTypeRow: {
-    alignItems: 'flex-start',
-    marginVertical: SPACING.sm,
+  emptyButton: {
+    backgroundColor: '#1E293B',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.md,
+    ...SHADOWS.medium,
   },
-  bodyTypeContainer: {
-    flex: 1,
-    paddingLeft: SPACING.lg,
-  },
-  bodyTypeValue: {
-    flex: 0.3,
-    textAlign: 'right',
-    flexWrap: 'wrap',
-    paddingHorizontal: SPACING.sm,
-    lineHeight: 20,
-  },
+  emptyButtonText: {
+    color: COLORS.white,
+    fontWeight: 'bold',
+  }
 });
 
 export default PlanListing; 
