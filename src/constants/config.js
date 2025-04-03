@@ -5,12 +5,14 @@ import { Platform } from 'react-native';
 // ==========================================
 
 // 设置API基础URL - 使用Wi-Fi局域网IP地址
-let API_BASE_URL = 'http://10.10.10.14:5000/';
+let API_BASE_URL = 'http://hongsenghq.ddns.net:4200';
+let API_BASE_URL_BASIC = 'http://hongsenghq.ddns.net:4200/';
 
 // API 配置 
 const CONFIG = {
   // API基础URL
-  API_URL: API_BASE_URL,
+  API_URL: API_BASE_URL_BASIC,
+  API_URL_FULL: API_BASE_URL,
   
   // API端点
   ENDPOINTS: {

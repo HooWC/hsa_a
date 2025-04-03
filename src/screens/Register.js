@@ -23,7 +23,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { COLORS, SPACING, SIZES, SHADOWS, RADIUS } from '../constants/theme';
 import CONFIG from '../constants/config';
 
+// 获取平台信息
+const isWeb = Platform.OS === 'web';
 const { width, height } = Dimensions.get('window');
+
+const WebContainer = isWeb ? ({ children }) => (
+  <View style={styles.webContainer}>{children}</View>
+) : View;
+
+const WebFormCard = isWeb ? ({ children }) => (
+  <View style={styles.webFormCard}>{children}</View>
+) : View;
 
 const RegisterBackground = () => (
   <LinearGradient
@@ -177,6 +187,20 @@ const Register = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const showAlert = (title, message, buttons = []) => {
+    if (Platform.OS === 'web') {
+      // Web 版本
+      window.alert(`${title}\n${message}`);
+      // 如果有按钮回调，执行第一个按钮的回调
+      if (buttons.length > 0 && buttons[0].onPress) {
+        buttons[0].onPress();
+      }
+    } else {
+      // Mobile 版本
+      Alert.alert(title, message, buttons);
+    }
+  };
+
   // 处理注册
   const handleRegister = async () => {
     const isValid = await validate();
@@ -206,20 +230,20 @@ const Register = () => {
       const data = await response.json();
       
       if (response.ok) {
-        Alert.alert(
+        showAlert(
           'Success',
           'Registration successful! Please login.',
-          [{ text: 'OK', onPress: () => navigation.navigate('Login') }]
+          [{ text: 'OK', onPress: navigateToLogin }] // 使用统一的导航方法
         );
       } else {
         if (data.message && data.message.includes('username')) {
           setErrors(prev => ({ ...prev, username: 'Username already exists' }));
         } else {
-          Alert.alert('Registration Failed', data.message || 'Something went wrong');
+          showAlert('Registration Failed', data.message || 'Something went wrong');
         }
       }
     } catch (error) {
-      Alert.alert('Error', 'Could not connect to server');
+      showAlert('Error', 'Could not connect to server');
     } finally {
       setIsLoading(false);
     }
@@ -442,18 +466,20 @@ const Register = () => {
                     style={styles.input}
                     value={password}
                     onChangeText={(text) => {
-                      // 只允许输入数字
-                      const numericText = text.replace(/[^0-9]/g, '');
-                      setPassword(numericText);
+                      // Allow only alphanumeric characters
+                      const alphanumericText = text.replace(/[^a-zA-Z0-9]/g, '');
+                      setPassword(alphanumericText);
                       if (errors.password) {
                         setErrors({...errors, password: null});
                       }
                     }}
                     secureTextEntry={secureTextEntry}
-                    placeholder="Enter 6 digits password"
+                    placeholder="Enter 6-12 alphanumeric characters"
                     placeholderTextColor="#94A3B8"
-                    keyboardType="numeric"
-                    maxLength={6}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    maxLength={12}
+                    minLength={6} 
                   />
                   <TouchableOpacity onPress={toggleSecureEntry} style={styles.visibilityIcon}>
                     <Ionicons 
@@ -475,9 +501,9 @@ const Register = () => {
                     style={styles.input}
                     value={confirmPassword}
                     onChangeText={(text) => {
-                      // 只允许输入数字
-                      const numericText = text.replace(/[^0-9]/g, '');
-                      setConfirmPassword(numericText);
+                      // 允许字母和数字输入
+                      const alphanumericText = text.replace(/[^a-zA-Z0-9]/g, '');
+                      setConfirmPassword(alphanumericText);
                       if (errors.confirmPassword) {
                         setErrors({...errors, confirmPassword: null});
                       }
@@ -485,8 +511,8 @@ const Register = () => {
                     secureTextEntry={confirmSecureTextEntry}
                     placeholder="Confirm your password"
                     placeholderTextColor="#94A3B8"
-                    keyboardType="numeric"
-                    maxLength={6}
+                    autoCorrect={false}    // 禁用自动修正
+                    maxLength={12}
                   />
                   <TouchableOpacity onPress={toggleConfirmSecureEntry} style={styles.visibilityIcon}>
                     <Ionicons 

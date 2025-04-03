@@ -80,7 +80,7 @@ const DashboardCard = ({ title, icon, description, onPress, colors, delay = 0 })
   );
 };
 
-// 通知卡片组件 - 美化版本
+// 通知卡片组件
 const NotificationCard = ({ message, time, isNew }) => (
   <View style={styles.notificationCard}>
     {isNew && <View style={styles.notificationDot} />}
@@ -128,28 +128,37 @@ const Home = () => {
   }, []);
 
   const handleLogout = async () => {
-    Alert.alert(
-      'Confirm',
-      'Are you sure you want to log out?',
-      [
-        {
-          text: 'Cancel',
-          style: 'cancel',
-        },
-        {
-          text: 'Sure',
-          onPress: async () => {
-            // 清除 token
-            await AsyncStorage.removeItem('userToken');
-            // 重置导航到登录页面
-            navigation.reset({
-              index: 0,
-              routes: [{ name: 'Login', params: { clearData: true } }],
-            });
+    if (Platform.OS === 'web') {
+      // Web 版本使用浏览器原生 confirm
+      const isConfirmed = window.confirm('Are you sure you want to log out?');
+      if (isConfirmed) {
+        window.localStorage.removeItem('userToken');
+        // Web 导航到登录页，假设使用 React Router
+        window.location.href = '/login'; // 或你的前端路由逻辑
+      }
+    } else {
+      // Mobile 版本使用 React Native Alert
+      Alert.alert(
+        'Confirm',
+        'Are you sure you want to log out?',
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
           },
-        },
-      ]
-    );
+          {
+            text: 'Sure',
+            onPress: async () => {
+              await AsyncStorage.removeItem('userToken');
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login', params: { clearData: true } }],
+              });
+            },
+          },
+        ]
+      );
+    }
   };
 
   const handleWeightCert = () => {
@@ -237,7 +246,7 @@ const Home = () => {
         </LinearGradient>
       </Animated.View>
       
-      {/* 通知面板 - 美化版本 */}
+      {/* 通知面板 */}
       {showNotifications && (
         <View style={styles.notificationsPanel}>
           <View style={styles.notificationsHeader}>
@@ -268,7 +277,7 @@ const Home = () => {
         </View>
       )}
       
-      {/* 主内容区 - 美化版本 */}
+      {/* 主内容区 */}
       <ScrollView 
         style={styles.contentContainer}
         contentContainerStyle={styles.scrollContent}

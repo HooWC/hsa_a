@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
   RefreshControl,
   Animated,
+  Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -112,15 +113,19 @@ const WeightCertListing = () => {
 
   const fetchWeightCerts = async () => {
     try {
-      const token = await AsyncStorage.getItem('userToken');
+      // 跨平台获取 token
+      const token = Platform.OS === 'web'
+        ? window.localStorage.getItem('userToken')
+        : await AsyncStorage.getItem('userToken');
       //console.log('Token:', token);
 
-      const response = await fetch('http://10.10.10.14:5000/weightCerts', {
+      const response = await fetch(`${API_BASE_URL}/weightCerts`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: Platform.OS === 'web' ? 'include' : undefined // Web 需要 credentials
       });
 
       const data = await response.json();
@@ -129,7 +134,7 @@ const WeightCertListing = () => {
       
     } catch (err) {
       console.error('Error:', err);
-      setError('获取数据失败');
+      setError('Failed to get data');
     } finally {
       setLoading(false);
       setRefreshing(false);

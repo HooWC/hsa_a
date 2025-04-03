@@ -7,6 +7,7 @@ import {
   ScrollView,
   StatusBar,
   Dimensions,
+  Platform,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -36,6 +37,14 @@ const FileDetailScreen = () => {
       }).format(date);
     } catch (error) {
       return 'Invalid Date';
+    }
+  };
+
+  const showAlert = (message, title ) => {
+    if (Platform.OS === 'web') {
+      window.alert(`${title}: ${message}`);
+    } else {
+      Alert.alert(title, message);
     }
   };
 
@@ -180,7 +189,9 @@ const FileDetailScreen = () => {
               style={styles.actionButton}
               onPress={() => {
                 // 在这里添加查看/下载文件的逻辑
-                alert('Cannot access files on computer');
+                Platform.OS === 'web' 
+                  ? window.alert('Cannot access files on computer') 
+                  : Alert.alert('Cannot access files on computer');
               }}
             >
               <Ionicons name="eye-outline" size={20} color={COLORS.white} />

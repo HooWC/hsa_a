@@ -26,6 +26,8 @@ import Button from '../components/Button';
 import { COLORS, SPACING, SIZES, SHADOWS, RADIUS } from '../constants/theme';
 import CONFIG from '../constants/config';
 
+// 如果是 Web 环境，使用 localStorage 替代 AsyncStorage
+const storage = Platform.OS === 'web' ? window.localStorage : AsyncStorage;
 const { width, height } = Dimensions.get('window');
 
 const LoginBackground = () => (
@@ -166,23 +168,48 @@ const Login = () => {
       const data = await response.json();
       
       if (response.ok && data.token) {
-        // 保存 token 到 AsyncStorage
-        await AsyncStorage.setItem('userToken', data.token);
+        // 保存 token 到存储
+        if (Platform.OS === 'web') {
+          storage.setItem('userToken', data.token);
+        } else {
+          await AsyncStorage.setItem('userToken', data.token);
+        }
+        
         // 登录成功，直接进入主页
-        navigation.navigate('Home', { 
-          username: data.user.username,
-          userId: data.user.id,
-          token: data.token
-        });
+        if (Platform.OS === 'web') {
+          // Web 版本的导航逻辑
+          window.location.href = '/home'; // 或者使用你的前端路由
+          // 或者存储用户数据到全局状态
+        } else {
+          navigation.navigate('Home', { 
+            username: data.user.username,
+            userId: data.user.id,
+            token: data.token
+          });
+        }
+        
+        // 显示成功提示
+        if (Platform.OS === 'web') {
+          window.alert('Login successful! Redirecting...');
+        } else {
+          Alert.alert('Success', 'Login successful!');
+        }
       } else {
         // 登录失败，显示错误信息
-        Alert.alert('Login failed', data.message || 'Wrong username or password');
+        const errorMessage = data.message || 'Wrong username or password';
+        if (Platform.OS === 'web') {
+          window.alert(`Login failed: ${errorMessage}`);
+        } else {
+          Alert.alert('Login failed', errorMessage);
+        }
       }
     } catch (error) {
-      Alert.alert(
-        'Connection error', 
-        'Unable to connect to the server'
-      );
+      const errorMessage = 'Unable to connect to the server';
+      if (Platform.OS === 'web') {
+        window.alert(`Connection error: ${errorMessage}`);
+      } else {
+        Alert.alert('Connection error', errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }

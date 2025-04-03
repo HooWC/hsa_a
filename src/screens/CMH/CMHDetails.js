@@ -9,9 +9,11 @@ import {
   Dimensions,
   ActivityIndicator,
   Alert,
+  Platform,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { API_BASE_URL } from '../../constants/config';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SPACING, SIZES, SHADOWS, RADIUS } from '../../constants/theme';
@@ -54,10 +56,12 @@ const CMHDetails = () => {
   useEffect(() => {
     const fetchAdditionalData = async () => {
       try {
-        const token = await AsyncStorage.getItem('userToken');
+        const token = Platform.OS === 'web'
+        ? window.localStorage.getItem('userToken')
+        : await AsyncStorage.getItem('userToken');
         
         // 获取 chassismh 数据 - 对应第一个界面Chassis
-        const chassismhResponse = await fetch(`http://10.10.10.14:5000/chassismh/${cmh.stock_id}`, {
+        const chassismhResponse = await fetch(`${API_BASE_URL}/chassismh/${cmh.stock_id}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -68,7 +72,7 @@ const CMHDetails = () => {
         setChassismhData(chassismhData);
         
         // 获取 dsoi 和 quote 数据 - 对应第二个界面History
-        const dsoiResponse = await fetch(`http://10.10.10.14:5000/dsoi/${cmh.stock_id}`, {
+        const dsoiResponse = await fetch(`${API_BASE_URL}/dsoi/${cmh.stock_id}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -78,7 +82,7 @@ const CMHDetails = () => {
         const dsoiData = await dsoiResponse.json();
         setDsoiData(dsoiData);
         
-        const quoteResponse = await fetch(`http://10.10.10.14:5000/quote/${cmh.stock_id}`, {
+        const quoteResponse = await fetch(`${API_BASE_URL}/quote/${cmh.stock_id}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -89,7 +93,7 @@ const CMHDetails = () => {
         setQuoteData(quoteData);
         
         // 获取 chassisfile 数据 - 对应第三个界面Picture
-        const chassisfileResponse = await fetch(`http://10.10.10.14:5000/chassisfile/${cmh.stock_id}`, {
+        const chassisfileResponse = await fetch(`${API_BASE_URL}/chassisfile/${cmh.stock_id}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -101,7 +105,7 @@ const CMHDetails = () => {
         
       } catch (err) {
         console.error('Error:', err);
-        setError('获取关联数据失败');
+        setError('Failed to get data');
       } finally {
         setLoading(false);
       }
@@ -231,7 +235,7 @@ const CMHDetails = () => {
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={COLORS.primary} />
-          <Text style={styles.loadingText}>加载中...</Text>
+          <Text style={styles.loadingText}>Loading...</Text>
         </View>
       ) : (
         <>

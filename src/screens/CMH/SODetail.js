@@ -80,7 +80,7 @@ const formatValue = (key, value) => {
   }
 
   if (value && typeof value === 'object' && value.type === 'Buffer') {
-      return '[Buffer数据]';
+      return '[Buffer data]';
   }
 
   // 解析 ISO 8601 日期格式，并转换为 UTC
