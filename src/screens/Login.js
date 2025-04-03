@@ -179,7 +179,12 @@ const Login = () => {
         // 登录成功，直接进入主页
         if (Platform.OS === 'web') {
           // Web 版本的导航逻辑
-          window.location.href = '/home'; // 或者使用你的前端路由
+          //window.location.href = '/home'; // 或者使用你的前端路由
+          navigation.navigate('Home', { 
+            username: data.user.username,
+            userId: data.user.id,
+            token: data.token
+          });
           // 或者存储用户数据到全局状态
         } else {
           navigation.navigate('Home', { 
@@ -374,6 +379,10 @@ const Login = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    width: '100%',
+    maxWidth: '100%',
+    height:'100vh',
+    overflowX: 'hidden', 
   },
   scrollContainer: {
     flexGrow: 1,

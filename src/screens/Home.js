@@ -135,7 +135,11 @@ const Home = () => {
       if (isConfirmed) {
         window.localStorage.removeItem('userToken');
         // Web 导航到登录页，假设使用 React Router
-        window.location.href = '/login'; // 或你的前端路由逻辑
+        /* window.location.href = '/login'; */ // 或你的前端路由逻辑
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Login', params: { clearData: true } }],
+        });
       }
     } else {
       // Mobile 版本使用 React Native Alert

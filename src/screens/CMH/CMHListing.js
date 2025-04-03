@@ -186,7 +186,7 @@ const CMHListing = () => {
       setPage(pageNum);
     } catch (err) {
       console.error('Error:', err);
-      setError('获取数据失败');
+      setError('Failed to get data');
     } finally {
       setLoading(false);
       setRefreshing(false);
