@@ -17,7 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SPACING, SIZES, SHADOWS, RADIUS } from '../../constants/theme';
-import { API_BASE_URL } from '../../constants/config';
+import CONFIG from '../../constants/config';
 
 // 提取成单独的组件，这样就可以在组件内部使用hooks
 const WeightCertItem = ({ item, index, navigation }) => {
@@ -117,15 +117,14 @@ const WeightCertListing = () => {
       const token = Platform.OS === 'web'
         ? window.localStorage.getItem('userToken')
         : await AsyncStorage.getItem('userToken');
-      //console.log('Token:', token);
+      console.log('Token:', token);
 
-      const response = await fetch(`${API_BASE_URL}/weightCerts`, {
+      const response = await fetch(`${CONFIG.API_BASE_URL}/weightCerts`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        credentials: Platform.OS === 'web' ? 'include' : undefined // Web 需要 credentials
       });
 
       const data = await response.json();

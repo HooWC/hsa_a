@@ -11,13 +11,14 @@ import {
   RefreshControl,
   Alert,
   Animated,
+  Platform,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { API_BASE_URL } from '../../constants/config';
 import { COLORS, SPACING, SIZES, SHADOWS, RADIUS } from '../../constants/theme';
+import CONFIG from '../../constants/config';
 
 // 提取成单独的组件，这样就可以在组件内部使用hooks
 const CMHListItem = ({ item, index, navigation }) => {
@@ -159,7 +160,7 @@ const CMHListing = () => {
       //console.log('Token:', token);
       setLoadingMore(pageNum > 1);
 
-      const response = await fetch(`${API_BASE_URL}/cmh?page=${pageNum}&size=${pageSize}`, {
+      const response = await fetch(`${CONFIG.API_BASE_URL}/cmh?page=${pageNum}&size=${pageSize}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -185,7 +186,7 @@ const CMHListing = () => {
       setPage(pageNum);
     } catch (err) {
       console.error('Error:', err);
-      setError('Failed to get data');
+      setError('获取数据失败');
     } finally {
       setLoading(false);
       setRefreshing(false);

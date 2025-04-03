@@ -16,7 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { API_BASE_URL } from '../../constants/config';
+import CONFIG from '../../constants/config';
 import { COLORS, SPACING, SIZES, SHADOWS, RADIUS } from '../../constants/theme';
 
 // 提取成单独的组件，这样就可以在组件内部使用hooks
@@ -114,7 +114,7 @@ const PlanListing = () => {
         : await AsyncStorage.getItem('userToken');
       //console.log('Token:', token);
 
-      const response = await fetch(`${API_BASE_URL}/plans`, {
+      const response = await fetch(`${CONFIG.API_BASE_URL}/plans`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

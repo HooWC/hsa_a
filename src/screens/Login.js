@@ -169,8 +169,9 @@ const Login = () => {
       
       if (response.ok && data.token) {
         // 保存 token 到存储
+        // 确保 Web 端统一使用 window.localStorage
         if (Platform.OS === 'web') {
-          storage.setItem('userToken', data.token);
+          window.localStorage.setItem('userToken', data.token); // 修改这里
         } else {
           await AsyncStorage.setItem('userToken', data.token);
         }
@@ -186,13 +187,6 @@ const Login = () => {
             userId: data.user.id,
             token: data.token
           });
-        }
-        
-        // 显示成功提示
-        if (Platform.OS === 'web') {
-          window.alert('Login successful! Redirecting...');
-        } else {
-          Alert.alert('Success', 'Login successful!');
         }
       } else {
         // 登录失败，显示错误信息

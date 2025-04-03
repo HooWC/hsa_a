@@ -11,7 +11,8 @@ import {
   Dimensions,
   ScrollView,
   Animated,
-  FlatList
+  FlatList,
+  Platform,
 } from 'react-native';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -21,7 +22,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width, height } = Dimensions.get('window');
 
-// 卡片项组件 - 美化版本
+// 卡片项组件
 const DashboardCard = ({ title, icon, description, onPress, colors, delay = 0 }) => {
   const animValue = new Animated.Value(0);
   
@@ -149,7 +150,10 @@ const Home = () => {
           {
             text: 'Sure',
             onPress: async () => {
-              await AsyncStorage.removeItem('userToken');
+              await (Platform.OS === 'web' 
+                ? (window.localStorage.removeItem('userToken'), undefined)
+                : AsyncStorage.removeItem('userToken')
+              );
               navigation.reset({
                 index: 0,
                 routes: [{ name: 'Login', params: { clearData: true } }],
@@ -303,7 +307,7 @@ const Home = () => {
             icon={<Ionicons name="clipboard" size={32} color="#fff" />}
             onPress={handlePlan}
             colors={['#0F172A', '#334155']}
-            delay={350}
+            delay={400}
           />
 
           <DashboardCard
@@ -312,7 +316,7 @@ const Home = () => {
             icon={<Ionicons name="car" size={32} color="#fff" />}
             onPress={handleCMH}
             colors={['#2563EB', '#3B82F6']}
-            delay={500}
+            delay={600}
           />  
         </View>
       </ScrollView>

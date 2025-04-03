@@ -12,7 +12,7 @@ let API_BASE_URL_BASIC = 'http://hongsenghq.ddns.net:4200/';
 const CONFIG = {
   // API基础URL
   API_URL: API_BASE_URL_BASIC,
-  API_URL_FULL: API_BASE_URL,
+  API_BASE_URL: API_BASE_URL,
   
   // API端点
   ENDPOINTS: {

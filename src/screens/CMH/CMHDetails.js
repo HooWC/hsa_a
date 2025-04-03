@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { API_BASE_URL } from '../../constants/config';
+import CONFIG from '../../constants/config';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { COLORS, SPACING, SIZES, SHADOWS, RADIUS } from '../../constants/theme';
@@ -61,7 +61,7 @@ const CMHDetails = () => {
         : await AsyncStorage.getItem('userToken');
         
         // 获取 chassismh 数据 - 对应第一个界面Chassis
-        const chassismhResponse = await fetch(`${API_BASE_URL}/chassismh/${cmh.stock_id}`, {
+        const chassismhResponse = await fetch(`${CONFIG.API_BASE_URL}/chassismh/${cmh.stock_id}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -72,7 +72,7 @@ const CMHDetails = () => {
         setChassismhData(chassismhData);
         
         // 获取 dsoi 和 quote 数据 - 对应第二个界面History
-        const dsoiResponse = await fetch(`${API_BASE_URL}/dsoi/${cmh.stock_id}`, {
+        const dsoiResponse = await fetch(`${CONFIG.API_BASE_URL}/dsoi/${cmh.stock_id}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -82,7 +82,7 @@ const CMHDetails = () => {
         const dsoiData = await dsoiResponse.json();
         setDsoiData(dsoiData);
         
-        const quoteResponse = await fetch(`${API_BASE_URL}/quote/${cmh.stock_id}`, {
+        const quoteResponse = await fetch(`${CONFIG.API_BASE_URL}/quote/${cmh.stock_id}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -93,7 +93,7 @@ const CMHDetails = () => {
         setQuoteData(quoteData);
         
         // 获取 chassisfile 数据 - 对应第三个界面Picture
-        const chassisfileResponse = await fetch(`${API_BASE_URL}/chassisfile/${cmh.stock_id}`, {
+        const chassisfileResponse = await fetch(`${CONFIG.API_BASE_URL}/chassisfile/${cmh.stock_id}`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
